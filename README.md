@@ -11,3 +11,7 @@ npm run build   # static site in dist/
 ```
 
 Every push to `main` builds and deploys to GitHub Pages through `.github/workflows/deploy.yml`.
+
+## License
+
+All rights reserved. You're welcome to read the code, but please don't reuse the design, code or content without asking. See [LICENSE](LICENSE).

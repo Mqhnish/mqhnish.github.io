@@ -1,0 +1,13 @@
+Copyright (c) 2026 Mohnish Singh Rawat. All rights reserved.
+
+This repository contains the source code, design and written content of my
+personal website, https://mqhnish.github.io.
+
+You may view the code and learn from it. You may not copy, modify,
+redistribute or deploy any part of it, including the design, the 3D terminal
+model, the shaders, the animations or the text, without my written permission.
+
+Third-party libraries used here (Three.js, GSAP, Lenis, number-flow and
+others) remain under their own licences.
+
+To ask about using something, email mohnishk001@e.ntu.edu.sg.
