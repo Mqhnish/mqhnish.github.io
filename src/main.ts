@@ -10,6 +10,7 @@ import { Terminal, type Pose } from './terminal';
 import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
 import { themes, current, applyTheme } from './theme';
+import { figures } from './charts';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -333,6 +334,13 @@ ScrollTrigger.create({
 });
 
 /* ---------------- numbers ---------------- */
+document.querySelectorAll('.numbers__grid li').forEach((li, i) => figures[i] && li.insertAdjacentHTML('beforeend', figures[i]()));
+ScrollTrigger.create({
+  trigger: '.numbers__grid',
+  start: 'top 75%',
+  once: true,
+  onEnter: () => $('.numbers__grid').classList.add('is-in'),
+});
 const flows = [...document.querySelectorAll<NumberFlow>('number-flow')];
 flows.forEach((f) => {
   const d = Number(f.dataset.decimals ?? 0);

@@ -11,7 +11,7 @@
 
   --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  --font-script: 'Mr Dafoe', 'Brush Script MT', cursive;
+  --font-script: 'Kaushan Script', 'Brush Script MT', cursive;
 
   /* 8pt spacing scale */
   --s1: 4px;
@@ -519,6 +519,89 @@ html.is-grabbing * {
   font-size: 0.32em;
   letter-spacing: 0;
 }
+/* figures under each number: ink on the accent, drawn in when the band arrives */
+.fig {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin-top: var(--s2);
+  overflow: visible;
+  color: var(--lime-ink);
+}
+.fig__lbl {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  fill: currentColor;
+  opacity: 0.72;
+}
+.fig__axis line {
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.45;
+}
+.fig__solid,
+.fig__pop {
+  fill: currentColor;
+}
+.fig__ghost {
+  fill: currentColor;
+  opacity: 0.22;
+}
+.fig__hatch {
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+.fig__hatchbox {
+  stroke: currentColor;
+  stroke-width: 1;
+}
+.fig__draw {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+.fig__grow {
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+.fig__pop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .numbers__grid:not(.is-in) .fig__grow {
+    transform: scaleX(0);
+  }
+  .numbers__grid:not(.is-in) .fig__pop {
+    transform: scale(0);
+    opacity: 0;
+  }
+  .numbers__grid:not(.is-in) .fig__draw {
+    stroke-dashoffset: 1;
+  }
+  .fig__grow {
+    transition: transform 900ms var(--ease-out) calc(300ms + var(--i, 0) * 70ms);
+  }
+  .fig__pop {
+    transition:
+      transform 420ms var(--ease-out) calc(200ms + var(--i, 0) * 9ms),
+      opacity 200ms ease calc(200ms + var(--i, 0) * 9ms);
+  }
+  .fig__draw {
+    transition: stroke-dashoffset 800ms var(--ease-out) 500ms;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .fig rect.fig__pop:hover {
+    transform: scale(1.5);
+    transition-delay: 0ms;
+  }
+}
+
 number-flow {
   --number-flow-char-height: 0.9em;
 }
