@@ -18,13 +18,13 @@ export const projects: Project[] = [
     event: 'Optiver Perceptron 2026 · Problem 6',
     pitch: 'An arbitrage is only worth taking if it is still there when your order lands.',
     body: [
-      'Measures how fast crypto price gaps between Bybit, Binance and OKX close, predicts whether each one survives a given latency, and decides how much thinking it can afford: act on a fast check, wait for a slower model, or skip.',
-      'A six-feature logistic prior screens in 1.5 µs. Undecided cases go to gradient boosting on Kalman, OU half-life and order-flow features, calibrated with isotonic regression and compiled to a Numba tree walker.',
-      'Replay engine with injected latency, IOC legs, fees, partial-fill leg risk and an inventory cap. A lookahead test cuts the raw feeds at every decision and checks that nothing changes.',
+      'It measures how fast crypto price gaps between Bybit, Binance and OKX close and predicts whether a gap will survive a given latency. Then it decides how much thinking it can afford: act on a fast check, wait for a slower model, or skip.',
+      'A six-feature logistic model screens each gap in 1.5 µs. Cases it can\'t decide go to a gradient-boosted model on Kalman, OU half-life and order-flow features, calibrated with isotonic regression and compiled to a Numba tree walker.',
+      'The replay engine injects latency and models IOC legs, fees, partial-fill leg risk and an inventory cap. A lookahead test cuts the raw feeds at every decision point and checks that no decision changes, so no future data leaks in.',
     ],
     stats: [
       { value: '6.4 µs', label: 'slow-path inference' },
-      { value: '10 ms', label: 'live book recorder' },
+      { value: '10 ms', label: 'live order-book recorder' },
       { value: '3', label: 'venues' },
     ],
     stack: ['Python', 'Numba', 'gradient boosting', 'Kalman / OU', 'pytest + CI', 'systemd'],
@@ -37,12 +37,12 @@ export const projects: Project[] = [
     pitch: 'A shopping agent that picks each question by how much it will learn.',
     body: [
       'Finds a hidden target in a 50,000-product catalog in a few turns. Every turn it decides whether to recommend or ask one more question, and chooses that question by expected information gain.',
-      'Three retrieval routes (exact phrase, BM25, TF-IDF) fused per intent track. Standard library only: no tokens, no network, 39 ms a session.',
+      'Three retrieval methods (exact phrase, BM25 and TF-IDF) are blended, with different weights for each kind of request. It uses only the Python standard library: no LLM calls, no network, 39 ms a session.',
     ],
     stats: [
-      { value: '1.000', label: 'hit rate @10, 200 sessions' },
-      { value: '2.83', label: 'mean turns of 10' },
-      { value: '8.9×', label: 'official baseline' },
+      { value: '1.000', label: 'hit rate@10 over 200 sessions' },
+      { value: '2.83', label: 'average turns, 10 allowed' },
+      { value: '8.9×', label: 'the official baseline score' },
     ],
     stack: ['Python stdlib', 'BM25', 'TF-IDF', 'information gain', '261 tests'],
     links: [
@@ -56,12 +56,12 @@ export const projects: Project[] = [
     event: 'BharatCode Build League 2026 · open source',
     pitch: 'Point it at a repo. Get an onboarding guide you can trust.',
     body: [
-      'A command-line agent that reads a codebase the way a senior engineer would on day one, then writes ONBOARDING.md: how to run it, the architecture, one real flow, first tasks and a glossary.',
-      'The model gets read-only tools, a step budget and a strict format. Every file:line it cites is checked against the lines it was actually shown. On Express it even caught a wrong return type in Express’s own JSDoc.',
+      'A command-line agent that reads a codebase and writes ONBOARDING.md for a new developer: how to run it, the architecture, one real request traced end to end, good first tasks and a glossary.',
+      'The model gets read-only tools, a step budget and a strict format. Every file:line it cites is checked against the lines it was actually shown. On the Express codebase it also caught a wrong return type in Express’s own JSDoc.',
     ],
     stats: [
       { value: '108/108', label: 'citations verified' },
-      { value: '12', label: 'Indian languages' },
+      { value: '12', label: 'Indian languages it writes in' },
       { value: '0', label: 'dependencies' },
     ],
     stack: ['Python', 'LLM tool use', 'sandboxing', 'citation checks'],
@@ -73,13 +73,13 @@ export const projects: Project[] = [
     event: 'Side project',
     pitch: 'The laziest schedule that still hits every deadline.',
     body: [
-      'Paste your to-do brain dump. Gemma 4 reads it, Python resolves the dates and schedules every task as late as it can safely go inside the hours you are willing to work.',
-      'Then it tells you the one thing you wanted to know: how long you can do nothing. Every task has to quote the words it came from, so invented tasks get flagged.',
+      'Paste in a messy to-do list. Gemma 4 reads it, then Python works out the dates and schedules each task as late as it can safely go, inside the hours you are willing to work.',
+      'Then it tells you how long you can do nothing. Every task has to quote the words it came from, so a task the model made up gets flagged.',
     ],
     stats: [
-      { value: '30 min', label: 'slot scheduler' },
+      { value: '30 min', label: 'scheduling slots' },
       { value: '14 days', label: 'on one chart' },
-      { value: '.ics', label: 'one-click export' },
+      { value: '.ics', label: 'calendar export' },
     ],
     stack: ['Python', 'Gemma 4', 'backward scheduling', 'fact checks'],
     links: [
@@ -93,12 +93,12 @@ export const projects: Project[] = [
     event: 'Tencent Cloud AI Hackathon SG 2026 · FinTech track',
     pitch: 'Answers across Confluence, Jira, Slack and Drive without leaking what you can’t see.',
     body: [
-      'An enterprise knowledge assistant for a case set by Aspire. Every document is checked against the source platform’s own permissions at answer time, and every retrieval goes into a tamper-evident audit trail.',
-      'I designed the connector and permissions layer in a team of three.',
+      'A company knowledge assistant, built for a case set by Aspire. At answer time it checks every document against the source platform’s own permissions, and it logs every retrieval to a tamper-evident audit trail.',
+      'In a team of three, I designed the connectors and the permissions layer.',
     ],
     stats: [
       { value: '4', label: 'sources' },
-      { value: 'live', label: 'per-doc authz' },
+      { value: 'live', label: 'permission check per document' },
       { value: '3', label: 'person team' },
     ],
     stack: ['Python', 'FastAPI', 'RBAC', 'audit log'],
@@ -107,12 +107,12 @@ export const projects: Project[] = [
 ];
 
 export const more = [
-  { name: 'BiasGuard', meta: 'NYAS Junior Academy · research lead', text: 'Bias detection and mitigation for large AI systems. Presented internationally.' },
-  { name: 'weather-forecast-ml', meta: 'IIT Bombay Techfest · top 20', text: 'Random forests on 116k observations. R² 0.97 for temperature.', href: 'https://github.com/mqhnish/weather-forecast-ml' },
-  { name: 'multimodal-toxic-detector', meta: 'Personal', text: 'Text, image and audio classifiers combined by late fusion.', href: 'https://github.com/mqhnish/multimodal-toxic-detector' },
-  { name: 'orbital-mechanics', meta: 'Personal', text: 'Delta-v manoeuvres and transfers around the Earth and Moon.', href: 'https://github.com/mqhnish/orbital-mechanics-simulations' },
-  { name: 'Vyoma and SolarGrid', meta: 'NYAS Junior Academy · co-author', text: 'A systems model for a Mars settlement, and solar plan optimisation.' },
-  { name: 'Extinction 101', meta: 'Deep Learning Week · workshop', text: 'Taught ML by classifying whether an asteroid impact causes extinction.' },
+  { name: 'BiasGuard', meta: 'NYAS Junior Academy · research lead', text: 'Bias detection and mitigation for large AI systems. I led the research direction and presented it internationally.' },
+  { name: 'weather-forecast-ml', meta: 'IIT Bombay Techfest · top 20', text: 'A random forest on 116k observations, R² 0.97 for temperature.', href: 'https://github.com/mqhnish/weather-forecast-ml' },
+  { name: 'multimodal-toxic-detector', meta: 'Personal', text: 'Separate text, image and audio classifiers whose outputs are combined at the end (late fusion).', href: 'https://github.com/mqhnish/multimodal-toxic-detector' },
+  { name: 'orbital-mechanics', meta: 'Personal', text: 'Simulations of delta-v manoeuvres and orbit transfers around the Earth and Moon.', href: 'https://github.com/mqhnish/orbital-mechanics-simulations' },
+  { name: 'Vyoma and SolarGrid', meta: 'NYAS Junior Academy · co-author', text: 'Co-authored a survival guide for a Mars settlement, and a solar-energy optimisation study.' },
+  { name: 'Extinction 101', meta: 'Deep Learning Week · workshop', text: 'A workshop that teaches machine learning by predicting whether an asteroid impact would cause a mass extinction.' },
 ];
 
 export const experience = [

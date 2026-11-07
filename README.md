@@ -1,8 +1,8 @@
 # mqhnish.github.io
 
-Personal site of Mohnish Singh Rawat, CS at NTU. Live at https://mqhnish.github.io
+The personal site of Mohnish Singh Rawat, a computer science student at NTU. It's live at https://mqhnish.github.io.
 
-Built with Vite, TypeScript, Three.js, GSAP and Lenis. The 3D terminal in the hero is modelled in code (`src/terminal.ts`), its screen is drawn on a canvas each frame (`src/screens.ts`), and the thermal and glitch effects are one post-processing shader (`src/fx.ts`).
+It's built with Vite, TypeScript, Three.js, GSAP and Lenis. The 3D terminal is modelled in code (`src/terminal.ts`) and its screen is redrawn on a canvas every frame (`src/screens.ts`). The thermal and glitch effects, including the pixel mosaic on the screen, are one post-processing shader (`src/fx.ts`). The ink cursor and the dot field live in `src/trail.ts`, and the small charts in the numbers band are in `src/charts.ts`.
 
 ```bash
 npm install

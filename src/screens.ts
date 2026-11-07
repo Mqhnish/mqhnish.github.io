@@ -378,7 +378,7 @@ function drawHello(c: Ctx, time: number) {
     }
     c.font = MONO_SM;
     c.fillStyle = DIM;
-    c.fillText('or drag me around. i was built for this.', 28, y + 104);
+    c.fillText('or grab the terminal and spin it.', 28, y + 104);
   }
 }
 

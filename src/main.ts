@@ -282,18 +282,18 @@ if (term) {
 
 /* ---------------- ticker ---------------- */
 const tape = [
-  ['ARBPERCEPT', '6.4 µs', 'up', 'slow path'],
-  ['MARG', '108/108', 'up', 'citations'],
-  ['SHOPILOT', '8.9×', 'up', 'vs baseline'],
-  ['SHOPILOT', '2.83', 'up', 'turns to find'],
-  ['WEATHER', 'R² 0.97', 'up', '116k obs'],
-  ['ARBPERCEPT', '1.5 µs', 'up', 'logistic prior'],
-  ['SHOPILOT', '39 ms', 'up', 'a session'],
-  ['TECHFEST QCC', '1/40', 'up', 'final round'],
+  ['ARBPERCEPT', '6.4 µs', 'up', 'slow-path inference'],
+  ['MARG', '108/108', 'up', 'citations checked'],
+  ['SHOPILOT', '8.9×', 'up', 'the baseline score'],
+  ['SHOPILOT', '2.83', 'up', 'turns to find it'],
+  ['WEATHER', 'R² 0.97', 'up', '116k observations'],
+  ['ARBPERCEPT', '1.5 µs', 'up', 'first-pass screen'],
+  ['SHOPILOT', '39 ms', 'up', 'per session'],
+  ['TECHFEST QCC', 'final round', 'up', 'one of 40 teams'],
   ['SGT', '', 'dn', ''],
 ];
 const tapeHTML = tape
-  .map(([k, v, d, l]) => (k === 'SGT' ? `<span>SGT <b data-sgt>--:--</b></span>` : `<span><b>${k}</b> <i class="${d}">${d === 'up' ? '▲' : '▼'} ${v}</i> ${l}</span>`))
+  .map(([k, v, d, l]) => (k === 'SGT' ? `<span>SGT <b data-sgt>--:--</b></span>` : `<span><b>${k}</b> <i class="${d}">● ${v}</i> ${l}</span>`))
   .join('');
 $('[data-ticker]').innerHTML = tapeHTML + tapeHTML;
 const sgt = () => {
