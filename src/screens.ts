@@ -334,7 +334,7 @@ const HELLO_LINES: { t: string; col?: 'lime' | 'pink' | 'dim'; pad?: number }[] 
   { t: '> status' },
   { t: '  ● open to quant internships', col: 'lime' },
   { t: '> contact --list' },
-  { t: '  mail     mohnishk001@e.ntu.edu.sg', col: 'dim' },
+  { t: '  mail     mohnishsinghrawat@gmail.com', col: 'dim' },
   { t: '  github   mqhnish', col: 'dim' },
   { t: '  linkedin mohnishsrawat', col: 'dim' },
 ];

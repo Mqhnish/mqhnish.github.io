@@ -277,7 +277,7 @@ if (term) {
       label.textContent = screenLabels.hello;
     },
   });
-  t.onSayHi = () => (window.location.href = 'mailto:mohnishk001@e.ntu.edu.sg');
+  t.onSayHi = () => (window.location.href = 'mailto:mohnishsinghrawat@gmail.com');
 }
 
 /* ---------------- ticker ---------------- */
