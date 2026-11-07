@@ -9,6 +9,7 @@ import { current, type Theme } from './theme';
 import { ThermalGlitchShader } from './fx';
 import type { ScreenMode } from './content';
 import type { Program } from './screens';
+import { skyLight } from './sky';
 
 /**
  * The pocket trading terminal. GSAP drives `pose` from scroll; the render loop
@@ -152,6 +153,8 @@ export class Terminal {
   private themed: ((t: Theme) => void)[] = []; // redraws anything that carries an accent colour
   private rim!: THREE.PointLight;
   private warm!: THREE.PointLight;
+  private meteor = new THREE.PointLight('#ffffff', 0, 16, 1.6); // follows the shooting star
+  private meteorPos = new THREE.Vector3();
   private pmrem!: THREE.PMREMGenerator;
   private envTex: THREE.Texture | null = null;
   private screenMesh!: THREE.Mesh;
@@ -207,7 +210,7 @@ export class Terminal {
     this.warm.position.set(5, -2.5, 3);
     const key = new THREE.DirectionalLight('#ffffff', 1.2);
     key.position.set(2, 5, 7);
-    this.scene.add(this.rim, this.warm, key);
+    this.scene.add(this.rim, this.warm, key, this.meteor);
 
     // post-processing: render → thermal/glitch → tone map + sRGB.
     // The render target is multisampled: without it the composer drops the canvas's
@@ -672,6 +675,18 @@ export class Terminal {
     u.uTilt.value.set(this.tilt.y + this.drag.y, this.tilt.x + this.drag.x);
     u.uTime.value = ts;
     if (this.pointer.has) u.uMouse.value.set(this.pointer.cx / window.innerWidth, 1 - this.pointer.cy / window.innerHeight);
+
+    // a passing shooting star: put a light where its head is, a little in front of the device,
+    // so its glow slides across the glossy body and the glass
+    if (skyLight.i > 0.01) {
+      const nx = (skyLight.x / window.innerWidth) * 2 - 1;
+      const ny = -((skyLight.y / window.innerHeight) * 2 - 1);
+      this.meteorPos.set(nx, ny, 0.5).unproject(this.camera).sub(this.camera.position).normalize();
+      const dist = (this.camera.position.z - 2.2) / -this.meteorPos.z; // reach the plane z = 2.2
+      this.meteor.position.copy(this.camera.position).addScaledVector(this.meteorPos, dist);
+      this.meteor.color.set(skyLight.color).lerp(new THREE.Color('#ffffff'), 0.45);
+      this.meteor.intensity = skyLight.i * 70;
+    } else this.meteor.intensity = 0;
 
     (this.led.material as THREE.MeshBasicMaterial).color.copy(Math.floor(time / 700) % 2 ? this.ledOn : this.ledOff);
 

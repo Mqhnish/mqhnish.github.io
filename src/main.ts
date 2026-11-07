@@ -11,6 +11,7 @@ import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
 import { themes, current, applyTheme } from './theme';
 import { figures } from './charts';
+import { startSky } from './sky';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -122,6 +123,7 @@ try {
 }
 
 const label = $('[data-screen-label]');
+startSky();
 startField();
 startTrail();
 
