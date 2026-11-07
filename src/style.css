@@ -7,6 +7,7 @@
   --line: rgba(245, 245, 240, 0.14);
   --lime: #d4ff3a;
   --lime-ink: #0a0a0a;
+  --lime-text: var(--lime);
   --pink: #ff8a9e;
 
   --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
@@ -355,7 +356,7 @@ html.is-grabbing * {
   align-items: center;
 }
 .chapter span {
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .chapter::after {
   content: '';
@@ -408,7 +409,7 @@ html.is-grabbing * {
   color: var(--ink);
 }
 .ticker__track .up {
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .ticker__track .dn {
   color: var(--pink);
@@ -517,7 +518,7 @@ html.is-grabbing * {
   background: var(--line);
 }
 .hero__live b {
-  color: var(--lime);
+  color: var(--lime-text);
   font-weight: 600;
 }
 
@@ -601,7 +602,7 @@ html.is-grabbing * {
   color: var(--ink) !important;
 }
 .offers__fill b {
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .watch__rows li {
   display: grid;
@@ -618,7 +619,7 @@ html.is-grabbing * {
 }
 .watch__rows b {
   grid-row: span 2;
-  color: var(--lime);
+  color: var(--lime-text);
   font-weight: 600;
   padding-top: 3px;
 }
@@ -860,7 +861,7 @@ number-flow {
   color: var(--ink-faint);
 }
 .project__count b {
-  color: var(--lime);
+  color: var(--lime-text);
   font-weight: 600;
 }
 .project__name {
@@ -883,7 +884,7 @@ number-flow {
 }
 .project__pitch em {
   font-style: normal;
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .project__body p {
   color: var(--ink-dim);
@@ -910,7 +911,7 @@ number-flow {
   font-variant-numeric: tabular-nums;
   font-size: clamp(18px, 1.8vw, 24px);
   font-weight: 600;
-  color: var(--lime);
+  color: var(--lime-text);
   letter-spacing: -0.02em;
 }
 .project__stats span {
@@ -976,7 +977,7 @@ number-flow {
   .btn--ghost:hover {
     box-shadow: inset 0 0 0 1.5px var(--lime);
     background: transparent;
-    color: var(--lime);
+    color: var(--lime-text);
   }
 }
 
@@ -1113,7 +1114,7 @@ number-flow {
     opacity: 1;
   }
   .more__in:hover .more__art {
-    color: var(--lime);
+    color: var(--lime-text);
   }
   .more__in:hover .g--b {
     transform: translateX(-24px);
@@ -1134,7 +1135,7 @@ number-flow {
     animation: blink 900ms ease calc(var(--i) * 40ms);
   }
   a.more__in:hover .more__arrow {
-    color: var(--lime);
+    color: var(--lime-text);
     transform: translate(3px, -3px);
   }
 }
@@ -1209,7 +1210,7 @@ number-flow {
   border-bottom: 1px dashed var(--line);
 }
 .spec__head span:first-child {
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .spec dl {
   margin: 0 0 var(--s5);
@@ -1241,7 +1242,7 @@ number-flow {
   color: var(--ink);
 }
 .about__lit .w.hot.on {
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .about__cols {
   display: grid;
@@ -1313,7 +1314,7 @@ number-flow {
   white-space: nowrap;
   letter-spacing: -0.065em;
   text-decoration: none;
-  color: var(--lime);
+  color: var(--lime-text);
 }
 .contact__big a span {
   font-weight: 400;
@@ -1572,6 +1573,54 @@ number-flow {
 }
 @media (hover: hover) and (pointer: fine) {
   .shuffle:hover {
+    transform: scale(1.12);
+    border-color: var(--ink);
+  }
+}
+
+/* ---------- light / dark ---------- */
+.mode {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  margin-left: var(--s2);
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-faint);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms var(--ease-out),
+    border-color 160ms ease;
+}
+.mode svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* show the mode you'd switch to: a sun while dark, a moon while light */
+.mode .i-moon {
+  display: none;
+  fill: currentColor;
+  stroke: none;
+}
+.mode[aria-pressed='true'] .i-sun {
+  display: none;
+}
+.mode[aria-pressed='true'] .i-moon {
+  display: block;
+}
+.mode:active {
+  transform: scale(0.92);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mode:hover {
     transform: scale(1.12);
     border-color: var(--ink);
   }

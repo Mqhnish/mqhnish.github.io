@@ -9,7 +9,7 @@ import { projects, more, experience, awards, watchlist } from './content';
 import type { Terminal, Pose } from './terminal';
 import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
-import { themes, current, applyTheme, randomTheme } from './theme';
+import { themes, current, mode, applyTheme, randomTheme, setMode } from './theme';
 import { figures } from './charts';
 import { startSky, setSkyActive } from './sky';
 import { reducedMotion, setMotion, takeSavedScroll } from './motion';
@@ -383,14 +383,21 @@ picker.insertAdjacentHTML(
   themes
     .map(
       (t) =>
-        `<button class="swatch" role="radio" aria-label="${t.name} theme" title="${t.name}" data-theme-id="${t.id}" style="--a:${t.accent};--b:${t.light ? t.bg : t.accent2}"></button>`,
+        `<button class="swatch" role="radio" aria-label="${t.name} theme" title="${t.name}" data-theme-id="${t.id}" style="--a:${t.accent};--b:${t.accent2}"></button>`,
     )
     .join('') +
     `<button class="shuffle" type="button" data-shuffle aria-label="Shuffle to a random colour pair" title="Shuffle colours">
       <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h3.2c1.4 0 2.6.7 3.4 1.8l2.8 4.4c.8 1.1 2 1.8 3.4 1.8H17M3 14h3.2c1.4 0 2.6-.7 3.4-1.8M12.4 7.8c.8-1.1 2-1.8 3.4-1.8H17M15 4l2 2-2 2M15 12l2 2-2 2" /></svg>
+    </button>
+    <button class="mode" type="button" data-colour-mode aria-pressed="false" aria-label="Light mode" title="Light / dark">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <g class="i-sun"><circle cx="10" cy="10" r="3.6" /><path d="M10 2.2v2M10 15.8v2M2.2 10h2M15.8 10h2M4.5 4.5l1.4 1.4M14.1 14.1l1.4 1.4M4.5 15.5l1.4-1.4M14.1 5.9l1.4-1.4" /></g>
+        <path class="i-moon" d="M15.6 12.4A6.4 6.4 0 0 1 7.6 4.4a6.4 6.4 0 1 0 8 8z" />
+      </svg>
     </button>`,
 );
 const shuffleBtn = $<HTMLButtonElement>('[data-shuffle]');
+const modeBtn = $<HTMLButtonElement>("[data-colour-mode]");
 const syncPicker = () => {
   picker.querySelectorAll<HTMLButtonElement>('.swatch').forEach((b) => {
     const on = b.dataset.themeId === current.id;
@@ -401,7 +408,12 @@ const syncPicker = () => {
   shuffleBtn.classList.toggle('is-on', shuffled);
   shuffleBtn.style.setProperty('--a', shuffled ? current.accent : 'transparent');
   shuffleBtn.style.setProperty('--b', shuffled ? current.accent2 : 'transparent');
+  modeBtn.setAttribute('aria-pressed', String(mode === 'light'));
 };
+modeBtn.addEventListener('click', () => {
+  setMode(mode === 'light' ? 'dark' : 'light');
+  syncPicker();
+});
 syncPicker();
 picker.addEventListener('click', (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.swatch');
