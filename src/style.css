@@ -1243,8 +1243,9 @@ number-flow {
   align-items: baseline;
   gap: 0.08em;
   font-weight: 900;
-  font-size: clamp(80px, 17vw, 280px);
+  font-size: clamp(80px, 15vw, 250px);
   line-height: 0.85;
+  white-space: nowrap;
   letter-spacing: -0.065em;
   text-decoration: none;
   color: var(--lime);
@@ -1264,8 +1265,15 @@ number-flow {
   padding: 0;
   margin: 0 0 var(--s10);
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--s3) var(--s6);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s3);
+}
+/* on wide screens the contact text keeps left of the returning terminal */
+@media (min-width: 1100px) {
+  .contact__links {
+    max-width: 58%;
+  }
 }
 .contact__links a {
   text-decoration: none;
