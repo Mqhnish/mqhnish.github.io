@@ -111,6 +111,10 @@ const M = {
     opacity: 0.06,
     clearcoat: 1,
     envMapIntensity: 1.6,
+    // thin-film sheen: the glass picks up a faint oil-slick rainbow from the studio lights
+    iridescence: 1,
+    iridescenceIOR: 1.32,
+    iridescenceThicknessRange: [160, 560],
   }),
 };
 
@@ -665,6 +669,7 @@ export class Terminal {
       q[i].set(this.corner.x * 0.5 + 0.5, this.corner.y * 0.5 + 0.5);
     });
     u.uGlitch.value = this.glitch;
+    u.uTilt.value.set(this.tilt.y + this.drag.y, this.tilt.x + this.drag.x);
     u.uTime.value = ts;
     if (this.pointer.has) u.uMouse.value.set(this.pointer.cx / window.innerWidth, 1 - this.pointer.cy / window.innerHeight);
 

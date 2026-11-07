@@ -10,6 +10,11 @@ import * as THREE from 'three';
  *    and bands inside the lens shift sideways harder the faster the cursor moves
  *  - the screen quad is masked out, so the display stays readable under the lens
  *
+ * Holographic screen (inside the projected screen quad):
+ *  - a thin-film rainbow arch slides across the glass as the device tilts, so it reads as a reflection
+ *  - under the cursor the display breaks into a mosaic of square pixels, each block tinted by the film,
+ *    with the arch bending around the cursor; it stays shallow enough to read through
+ *
  * Global glitch (uGlitch 0..1): RGB split and band shifts on program switches.
  *
  * Colours arrive premultiplied by alpha (transparent canvas), so the lens only
@@ -24,6 +29,7 @@ export const ThermalGlitchShader = {
     uGlitch: { value: 0 },
     uSpeed: { value: 0 },
     uTime: { value: 0 },
+    uTilt: { value: new THREE.Vector2() },
     uQuad: { value: [new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2(), new THREE.Vector2()] },
   },
   vertexShader: /* glsl */ `
@@ -42,7 +48,13 @@ export const ThermalGlitchShader = {
     uniform float uSpeed;
     uniform float uTime;
     uniform vec2 uQuad[4];
+    uniform vec2 uTilt;
     varying vec2 vUv;
+
+    // thin-film interference, approximated with a cosine rainbow
+    vec3 film(float h) {
+      return 0.5 + 0.5 * cos(6.28318 * (h + vec3(0.0, 0.33, 0.67)));
+    }
 
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
@@ -72,6 +84,15 @@ export const ThermalGlitchShader = {
       return (pos || neg) ? 1.0 : 0.0;
     }
 
+    // position inside the screen quad, 0..1 on each axis (exact for a parallelogram, close enough in perspective)
+    vec2 quadUv(vec2 p) {
+      vec2 e1 = uQuad[1] - uQuad[0];
+      vec2 e2 = uQuad[3] - uQuad[0];
+      vec2 q = p - uQuad[0];
+      float det = cross2(e1, e2);
+      return vec2(cross2(q, e2), cross2(e1, q)) / det;
+    }
+
     float heatOf(vec4 c, float centre) {
       vec3 s = c.a > 0.0 ? c.rgb / c.a : c.rgb;
       float lum = dot(s, vec3(0.299, 0.587, 0.114));
@@ -99,8 +120,18 @@ export const ThermalGlitchShader = {
       float tear = step(0.72 - uSpeed * 0.35, hash(vec2(lensBand, tick)));
       uv.x += (hash(vec2(lensBand, tick + 3.0)) - 0.5) * (0.004 + uSpeed * 0.03) * tear * lens;
 
-      // pixel blocks on the rim
-      if (rim > 0.05) {
+      // ---------- holographic screen ----------
+      vec2 suv = quadUv(vUv);
+      vec2 mScreen = quadUv(uMouse);
+      // mosaic under the cursor: square blocks, bigger towards the middle of the lens
+      float mosaic = smoothstep(R * 0.5, R * 0.18, d) * uThermal * onScreen;
+      if (mosaic > 0.04) {
+        float px = floor(mix(3.0, 11.0, mosaic));
+        uv = (floor(uv * uRes / px) + 0.5) * px / uRes;
+      }
+
+      // pixel blocks on the rim (off the screen)
+      if (rim > 0.05 && onScreen < 0.5) {
         float px = mix(1.0, 7.0, rim);
         uv = (floor(uv * uRes / px) + 0.5) * px / uRes;
       }
@@ -113,7 +144,7 @@ export const ThermalGlitchShader = {
 
       // ---------- thermal, per channel ----------
       // on the display the lens only tints faintly and tears, so the content stays legible
-      float strength = lens * mix(0.62, 0.1, onScreen);
+      float strength = lens * (1.0 - onScreen) * 0.62;
       if (strength > 0.001) {
         float centre = smoothstep(R, 0.0, d);
         float noise = (hash(floor(vUv * uRes / 2.0) + tick) - 0.5) * 0.05;
@@ -123,6 +154,25 @@ export const ThermalGlitchShader = {
         vec3 th = vec3(thermal(hr).r, thermal(hg).g, thermal(hb).b);
         th *= 0.9 + 0.1 * sin(vUv.y * uRes.y * 1.4); // scanlines
         col.rgb = mix(col.rgb, th * col.a, strength);
+      }
+
+      // ---------- the film over the screen ----------
+      if (onScreen > 0.5) {
+        // an arch whose centre drifts with tilt and time, and leans towards the cursor while hovering
+        vec2 c = vec2(0.5 + uTilt.x * 1.6 + sin(uTime * 0.21) * 0.18, -0.25 - uTilt.y * 1.4);
+        c = mix(c, mScreen + vec2(0.0, -0.35), uThermal * 0.6);
+        float r = length((suv - c) * vec2(1.0, 1.35));
+        float arch = smoothstep(0.12, 0.0, abs(r - 0.62));
+        float hue = r * 2.4 - uTime * 0.05 + uTilt.x;
+        vec3 sheen = film(hue);
+        // block-quantised tint inside the mosaic, so each square catches its own colour
+        vec2 cell = floor(vUv * uRes / 12.0);
+        float flick = hash(cell + floor(uTime * 6.0));
+        vec3 blockTint = film(hue + flick * 0.35) * (0.55 + 0.45 * step(0.5, hash(cell)));
+        float a = col.a;
+        col.rgb += sheen * arch * 0.12 * a;                    // the travelling reflection
+        col.rgb += sheen * 0.025 * a;                          // a whisper of film everywhere
+        col.rgb = mix(col.rgb, col.rgb * 0.7 + blockTint * 0.28 * a, mosaic * 0.6);
       }
 
       gl_FragColor = col;
