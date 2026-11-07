@@ -80,19 +80,93 @@ export const themes: Theme[] = [
 ];
 
 const KEY = 'msr-theme';
+const CUSTOM = 'msr-theme-custom';
 
-function stored(): string | null {
+function stored(key: string): string | null {
   try {
-    return localStorage.getItem(KEY);
+    return localStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-export let current: Theme = themes.find((t) => t.id === stored()) ?? themes[0];
+/* ---------- random pairs that belong together ---------- */
+// OKLCH -> sRGB hex, pulling chroma in until the colour fits the gamut
+function oklch(L: number, C: number, h: number): string {
+  for (let c = C; c >= 0; c -= 0.005) {
+    const a = c * Math.cos((h * Math.PI) / 180);
+    const b = c * Math.sin((h * Math.PI) / 180);
+    const l_ = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+    const m_ = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+    const s_ = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+    const lin = [
+      4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
+      -1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
+      -0.0041960863 * l_ - 0.7034186147 * m_ + 1.707614701 * s_,
+    ];
+    if (lin.every((v) => v >= -0.0005 && v <= 1.0005)) {
+      return (
+        '#' +
+        lin
+          .map((v) => {
+            const x = Math.min(1, Math.max(0, v));
+            const g = x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055;
+            return Math.round(g * 255)
+              .toString(16)
+              .padStart(2, '0');
+          })
+          .join('')
+      );
+    }
+  }
+  return '#808080';
+}
 
-export function applyTheme(id: string) {
-  current = themes.find((t) => t.id === id) ?? themes[0];
+/**
+ * A dark theme from one random hue and a partner picked by a colour-wheel rule
+ * (complementary, split-complementary, triadic or analogous). Both accents stay light enough
+ * to read on the dark base; the base and the text carry a faint tint of the main hue.
+ */
+export function randomTheme(): Theme {
+  const h1 = Math.random() * 360;
+  const rules = [180, 150, 210, 120, 240, 40, -40];
+  const h2 = (h1 + rules[Math.floor(Math.random() * rules.length)] + (Math.random() * 16 - 8) + 360) % 360;
+  const bg = oklch(0.15, 0.014, h1);
+  const ink = oklch(0.97, 0.01, h1);
+  const n = parseInt(ink.slice(1), 16);
+  return {
+    id: 'random',
+    name: 'Shuffled',
+    bg,
+    raise: oklch(0.2, 0.018, h1),
+    ink,
+    dim: oklch(0.74, 0.018, h1),
+    faint: oklch(0.47, 0.016, h1),
+    line: `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},0.14)`,
+    accent: oklch(0.85, 0.21, h1),
+    onAccent: bg,
+    accent2: oklch(0.74, 0.18, h2),
+    light: false,
+  };
+}
+
+function storedCustom(): Theme | null {
+  try {
+    const t = JSON.parse(stored(CUSTOM) ?? 'null');
+    return t && t.id === 'random' ? (t as Theme) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Ice is the default; a shuffled theme is remembered like any other
+const saved = stored(KEY);
+export let current: Theme =
+  (saved === 'random' && storedCustom()) || themes.find((t) => t.id === saved) || themes.find((t) => t.id === 'ice')!;
+
+export function applyTheme(which: string | Theme) {
+  if (typeof which !== 'string') current = which;
+  else current = themes.find((t) => t.id === which) ?? ((which === 'random' && storedCustom()) || current);
   const r = document.documentElement;
   const s = r.style;
   s.setProperty('--bg', current.bg);
@@ -109,13 +183,14 @@ export function applyTheme(id: string) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', current.bg);
   try {
     localStorage.setItem(KEY, current.id);
+    if (current.id === 'random') localStorage.setItem(CUSTOM, JSON.stringify(current));
   } catch {
     /* private mode: the theme just won't persist */
   }
   window.dispatchEvent(new CustomEvent<Theme>('themechange', { detail: current }));
 }
 
-/** "#rrggbb" + alpha → "rgba(r,g,b,a)" */
+/** "#rrggbb" + alpha -> "rgba(r,g,b,a)" */
 export function rgba(hex: string, a: number) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;

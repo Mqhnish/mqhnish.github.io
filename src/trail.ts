@@ -1,4 +1,5 @@
 import { current, type Theme } from './theme';
+import { reducedMotion } from './motion';
 
 /**
  * Ink cursor: a liquid blob that follows the pointer and smears into a tapering stroke when you move fast.
@@ -16,7 +17,7 @@ interface P {
 
 export function startTrail() {
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = reducedMotion;
   if (!fine || reduced) return;
 
   const cv = document.createElement('canvas');
@@ -208,7 +209,7 @@ export function startField() {
   field.setAttribute('aria-hidden', 'true');
   field.innerHTML = '<div class="field__l"></div><div class="field__p"></div>';
   document.body.prepend(field);
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = reducedMotion;
   let mx = 0.7;
   let my = 0.4;
   window.addEventListener('pointermove', (e) => {

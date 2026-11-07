@@ -1463,3 +1463,128 @@ number-flow {
     transform: scale(1.12);
   }
 }
+
+/* ---------- motion toggle (nav) ---------- */
+.pill--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-size: var(--mono-sm);
+}
+.pill--icon svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pill--icon .i-play {
+  display: none;
+  fill: currentColor;
+  stroke: none;
+}
+.pill--icon[aria-pressed='true'] .i-pause {
+  display: none;
+}
+.pill--icon[aria-pressed='true'] .i-play {
+  display: block;
+}
+@media (max-width: 600px) {
+  .hero__foot {
+    flex-wrap: wrap;
+    row-gap: var(--s3);
+  }
+  .hero__line {
+    display: none;
+  }
+  .hero__live {
+    flex-basis: 100%;
+  }
+  .nav__links {
+    gap: 4px;
+  }
+  .pill {
+    padding: 5px 8px;
+    letter-spacing: 0;
+  }
+  .pill--icon {
+    gap: 0;
+    padding: 5px 7px;
+  }
+  .pill--icon .pill__txt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
+
+/* ---------- shuffle colours ---------- */
+.shuffle {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  margin-left: var(--s1);
+  border-radius: 50%;
+  border: 1.5px dashed var(--ink-faint);
+  background: conic-gradient(var(--a, transparent) 0 50%, var(--b, transparent) 50% 100%);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms var(--ease-out),
+    border-color 160ms ease;
+}
+.shuffle svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  mix-blend-mode: difference;
+}
+.shuffle.is-on {
+  border-style: solid;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--ink);
+}
+.shuffle:active {
+  transform: scale(0.92);
+}
+.shuffle.spin svg {
+  animation: shuffle-spin 420ms var(--ease-out);
+}
+@keyframes shuffle-spin {
+  from {
+    transform: rotate(-180deg);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .shuffle:hover {
+    transform: scale(1.12);
+    border-color: var(--ink);
+  }
+}
+
+/* ---------- motion off: everything stills ---------- */
+html.no-motion *,
+html.no-motion *::before,
+html.no-motion *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html.no-motion .about__lit .w {
+  color: var(--ink);
+}

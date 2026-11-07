@@ -1,4 +1,5 @@
 import { current, type Theme } from './theme';
+import { reducedMotion } from './motion';
 
 /**
  * Night sky behind the terminal.
@@ -48,7 +49,7 @@ const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 const DEPTH = [6, 14, 26]; // px of drift per layer at full cursor deflection
 
 export function startSky() {
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = reducedMotion;
   const cv = document.createElement('canvas');
   cv.className = 'sky';
   cv.setAttribute('aria-hidden', 'true');

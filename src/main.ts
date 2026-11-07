@@ -9,13 +9,14 @@ import { projects, more, experience, awards, watchlist } from './content';
 import type { Terminal, Pose } from './terminal';
 import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
-import { themes, current, applyTheme } from './theme';
+import { themes, current, applyTheme, randomTheme } from './theme';
 import { figures } from './charts';
 import { startSky, setSkyActive } from './sky';
+import { reducedMotion, setMotion, takeSavedScroll } from './motion';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduced = reducedMotion;
 
 // colour theme first, so nothing paints in the wrong colours
 applyTheme(current.id);
@@ -384,14 +385,23 @@ picker.insertAdjacentHTML(
       (t) =>
         `<button class="swatch" role="radio" aria-label="${t.name} theme" title="${t.name}" data-theme-id="${t.id}" style="--a:${t.accent};--b:${t.light ? t.bg : t.accent2}"></button>`,
     )
-    .join(''),
+    .join('') +
+    `<button class="shuffle" type="button" data-shuffle aria-label="Shuffle to a random colour pair" title="Shuffle colours">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h3.2c1.4 0 2.6.7 3.4 1.8l2.8 4.4c.8 1.1 2 1.8 3.4 1.8H17M3 14h3.2c1.4 0 2.6-.7 3.4-1.8M12.4 7.8c.8-1.1 2-1.8 3.4-1.8H17M15 4l2 2-2 2M15 12l2 2-2 2" /></svg>
+    </button>`,
 );
-const syncPicker = () =>
+const shuffleBtn = $<HTMLButtonElement>('[data-shuffle]');
+const syncPicker = () => {
   picker.querySelectorAll<HTMLButtonElement>('.swatch').forEach((b) => {
     const on = b.dataset.themeId === current.id;
     b.setAttribute('aria-checked', String(on));
-    b.tabIndex = on ? 0 : -1;
+    b.tabIndex = on || (current.id === 'random' && b === picker.querySelector('.swatch')) ? 0 : -1;
   });
+  const shuffled = current.id === 'random';
+  shuffleBtn.classList.toggle('is-on', shuffled);
+  shuffleBtn.style.setProperty('--a', shuffled ? current.accent : 'transparent');
+  shuffleBtn.style.setProperty('--b', shuffled ? current.accent2 : 'transparent');
+};
 syncPicker();
 picker.addEventListener('click', (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.swatch');
@@ -399,15 +409,30 @@ picker.addEventListener('click', (e) => {
   applyTheme(b.dataset.themeId!);
   syncPicker();
 });
+shuffleBtn.addEventListener('click', () => {
+  applyTheme(randomTheme());
+  syncPicker();
+  shuffleBtn.classList.remove('spin');
+  void shuffleBtn.offsetWidth; // restart the spin on every press
+  shuffleBtn.classList.add('spin');
+});
 picker.addEventListener('keydown', (e) => {
   if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-  const i = themes.findIndex((t) => t.id === current.id);
+  if (!(e.target as HTMLElement).classList.contains('swatch')) return;
+  const i = Math.max(0, themes.findIndex((t) => t.id === current.id));
   const next = themes[(i + (e.key === 'ArrowRight' ? 1 : themes.length - 1)) % themes.length];
   applyTheme(next.id);
   syncPicker();
   picker.querySelector<HTMLButtonElement>(`[data-theme-id="${next.id}"]`)?.focus();
   e.preventDefault();
 });
+
+/* ---------------- motion toggle ---------------- */
+const motionBtn = $<HTMLButtonElement>('[data-motion]');
+motionBtn.setAttribute('aria-pressed', String(reduced));
+motionBtn.setAttribute('aria-label', reduced ? 'Turn animations on' : 'Turn animations off');
+motionBtn.querySelector('.pill__txt')!.textContent = reduced ? 'Motion off' : 'Motion on';
+motionBtn.addEventListener('click', () => setMotion(reduced));
 
 /* ---------------- nav: frosted once scrolled, hides while reading down ---------------- */
 const nav = $('.nav');
@@ -496,4 +521,12 @@ if (!reduced) {
   lit.querySelectorAll('.w').forEach((w) => w.classList.add('on'));
 }
 
-window.addEventListener('load', () => ScrollTrigger.refresh());
+const savedY = takeSavedScroll();
+window.addEventListener('load', () => {
+  ScrollTrigger.refresh();
+  // after a motion toggle the page reloads; put the reader back where they were
+  if (savedY) {
+    if (lenis) lenis.scrollTo(savedY, { immediate: true });
+    else window.scrollTo(0, savedY);
+  }
+});
