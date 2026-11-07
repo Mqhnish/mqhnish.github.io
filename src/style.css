@@ -165,7 +165,7 @@ main > section {
   z-index: 60;
   pointer-events: none;
 }
-html:not(.is-light) .trail {
+.trail {
   mix-blend-mode: difference;
 }
 
