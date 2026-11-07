@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mohnish Rawat</title>
+    <meta name="description" content="Mohnish Singh Rawat. Computer science at NTU. Trading and ML systems, with every number checked." />
+    <meta name="theme-color" content="#0A0A0A" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&family=Mr+Dafoe&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip" href="#work">Skip to work</a>
+
+    <canvas id="terminal" aria-hidden="true"></canvas>
+
+    <header class="nav">
+      <a class="nav__mark" href="#top" aria-label="Back to top">MSR<span>01</span></a>
+      <nav class="nav__links" aria-label="Sections">
+        <a class="pill" href="#work">Work</a>
+        <a class="pill" href="#about">About</a>
+        <a class="pill pill--solid" href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- 00 HERO -->
+      <section class="hero" id="top">
+        <p class="hero__tag mono">
+          <span class="dot" aria-hidden="true"></span>Singapore · CS @ NTU, class of 2030 · open to quant internships
+        </p>
+        <h1 class="hero__name">
+          <span class="hero__word" data-split>Mohnish</span>
+          <svg class="hero__script" viewBox="0 0 520 200" aria-hidden="true" focusable="false">
+            <defs>
+              <mask id="writeMask">
+                <rect class="hero__wipe" x="0" y="0" width="520" height="200" fill="#fff" />
+              </mask>
+            </defs>
+            <text x="8" y="150" mask="url(#writeMask)">Rawat</text>
+          </svg>
+          <span class="sr-only">Singh Rawat</span>
+        </h1>
+        <p class="hero__lede">
+          I build trading and machine-learning systems, and I check every number they report.
+        </p>
+        <div class="hero__foot mono">
+          <div class="themes" role="radiogroup" aria-label="Colour theme" data-themes>
+            <span class="themes__label">theme</span>
+          </div>
+          <span class="hero__line" aria-hidden="true"></span>
+          <span class="hero__live">screen: <b data-screen-label>arbpercept.live</b></span>
+        </div>
+      </section>
+
+      <!-- 01 NUMBERS -->
+      <section class="numbers" aria-labelledby="numbers-title">
+        <div class="numbers__inner">
+          <header class="chapter mono"><span>01</span> Checked numbers</header>
+          <h2 id="numbers-title" class="numbers__title">Every claim here is tied to a test, a log or an evaluator I didn't write.</h2>
+          <ul class="numbers__grid" role="list">
+            <li><span class="stat"><number-flow data-to="6.4" data-decimals="1"></number-flow><i>µs</i></span><span class="mono">ArbPercept slow-path inference, down from 3–28 ms</span></li>
+            <li><span class="stat"><number-flow data-to="108"></number-flow><i>/108</i></span><span class="mono">Marg citations verified on Express</span></li>
+            <li><span class="stat"><number-flow data-to="8.9" data-decimals="1"></number-flow><i>×</i></span><span class="mono">Shopilot vs the official baseline</span></li>
+            <li><span class="stat"><number-flow data-to="2.83" data-decimals="2"></number-flow><i>turns</i></span><span class="mono">mean to find the product, budget of 10</span></li>
+            <li><span class="stat"><i>R²</i><number-flow data-to="0.97" data-decimals="3"></number-flow></span><span class="mono">weather model on 116k observations</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 02 WORK -->
+      <section class="work" id="work" aria-labelledby="work-title">
+        <header class="work__head">
+          <p class="chapter mono"><span>02</span> Selected work</p>
+          <h2 id="work-title" class="sr-only">Selected work</h2>
+        </header>
+        <div class="work__list" data-projects></div>
+      </section>
+
+      <!-- 03 MORE -->
+      <section class="more" aria-labelledby="more-title">
+        <p class="chapter mono"><span>03</span> Research and smaller builds</p>
+        <h2 id="more-title" class="section-title">Also on the bench</h2>
+        <ul class="more__grid" role="list" data-more></ul>
+      </section>
+
+      <!-- 04 ABOUT -->
+      <section class="about" id="about" aria-labelledby="about-title">
+        <p class="chapter mono"><span>04</span> About</p>
+        <h2 id="about-title" class="sr-only">About</h2>
+        <p class="about__lit" data-lit>
+          I moved to Singapore in August 2026 with two suitcases to study computer science at NTU. I like problems where
+          being roughly right isn't enough: will this price gap still be there in 40 milliseconds, did the model actually
+          read the line it cites. Outside class I'm an analyst with the Management Consulting Club and the Quant Finance
+          Academy, I help run Deep Learning Week, and I play competitive Pokémon, which is mostly expected value with
+          worse odds.
+        </p>
+        <div class="about__cols">
+          <div>
+            <h3 class="mono label">Experience</h3>
+            <ul class="rows" role="list" data-experience></ul>
+          </div>
+          <div>
+            <h3 class="mono label">Recognition</h3>
+            <ul class="rows" role="list" data-awards></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 CONTACT -->
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <p class="chapter mono"><span>05</span> Contact</p>
+        <h2 id="contact-title" class="contact__big">
+          <a href="mailto:mohnishk001@e.ntu.edu.sg" data-magnet>Say hi<span aria-hidden="true">→</span></a>
+        </h2>
+        <ul class="contact__links mono" role="list">
+          <li><a href="mailto:mohnishk001@e.ntu.edu.sg">mohnishk001@e.ntu.edu.sg</a></li>
+          <li><a href="https://github.com/mqhnish" target="_blank" rel="noopener">github.com/mqhnish</a></li>
+          <li><a href="https://www.linkedin.com/in/mohnishsrawat" target="_blank" rel="noopener">linkedin.com/in/mohnishsrawat</a></li>
+        </ul>
+        <footer class="foot mono">
+          <span>© 2026 Mohnish Singh Rawat</span>
+          <span>Built with Three.js, GSAP and a lot of checking</span>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

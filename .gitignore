@@ -1,0 +1,8 @@
+node_modules
+dist
+.DS_Store
+
+# private working notes, not for the public repo
+brief.md
+content.md
+.claude/
