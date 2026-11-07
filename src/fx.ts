@@ -11,9 +11,9 @@ import * as THREE from 'three';
  *  - the screen quad is masked out, so the display stays readable under the lens
  *
  * Holographic screen (inside the projected screen quad):
- *  - a thin-film rainbow arch slides across the glass as the device tilts, so it reads as a reflection
- *  - under the cursor the display breaks into a mosaic of square pixels, each block tinted by the film,
- *    with the arch bending around the cursor; it stays shallow enough to read through
+ *  - a faint thin-film arch slides across the glass as the device tilts, so it reads as a reflection
+ *  - under the cursor the display breaks into square pixels, each block posterised to its own thermal
+ *    colour with a glitch channel tear; shallow enough to read through
  *
  * Global glitch (uGlitch 0..1): RGB split and band shifts on program switches.
  *
@@ -165,14 +165,16 @@ export const ThermalGlitchShader = {
         float arch = smoothstep(0.12, 0.0, abs(r - 0.62));
         float hue = r * 2.4 - uTime * 0.05 + uTilt.x;
         vec3 sheen = film(hue);
-        // block-quantised tint inside the mosaic, so each square catches its own colour
-        vec2 cell = floor(vUv * uRes / 12.0);
-        float flick = hash(cell + floor(uTime * 6.0));
-        vec3 blockTint = film(hue + flick * 0.35) * (0.55 + 0.45 * step(0.5, hash(cell)));
+        // inside the mosaic each square goes thermal: its own heat, posterised, with the channels torn apart
+        vec2 cell = floor(vUv * uRes / 11.0);
+        float flick = hash(cell + floor(uTime * 8.0));
+        float h = floor((heatOf(col, mosaic) + (flick - 0.5) * 0.18) * 6.0) / 6.0;
+        vec3 heat = thermal(h);
+        float tearB = step(0.82, flick) * 0.08;
+        vec3 blockTint = vec3(thermal(h + tearB).r, heat.g, thermal(h - tearB).b);
         float a = col.a;
-        col.rgb += sheen * arch * 0.12 * a;                    // the travelling reflection
-        col.rgb += sheen * 0.025 * a;                          // a whisper of film everywhere
-        col.rgb = mix(col.rgb, col.rgb * 0.7 + blockTint * 0.28 * a, mosaic * 0.6);
+        col.rgb += sheen * arch * 0.08 * a;                    // a faint travelling reflection on the glass
+        col.rgb = mix(col.rgb, col.rgb * 0.55 + blockTint * 0.5 * a, mosaic * 0.7);
       }
 
       gl_FragColor = col;

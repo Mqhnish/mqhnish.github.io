@@ -90,13 +90,15 @@ export function startTrail() {
   };
 
   // one full pass of the shape (smear + head) in the current fill style, offset by (ox, oy)
-  const shape = (now: number, ox: number, oy: number, ang: number, stretch: number) => {
+  const shape = (now: number, ox: number, oy: number, ang: number, stretch: number, heat = false) => {
     c.save();
     c.translate(ox, oy);
     for (let i = 1; i < pts.length; i++) {
       const a = pts[i - 1];
       const b = pts[i];
       const life = 1 - (now - b.t) / LIFE;
+      // thermal tail: the fresh ink is white-hot, it cools through the accent into accent2
+      if (heat) c.strokeStyle = life > 0.62 ? '#ffffff' : life > 0.3 ? A1 : A2;
       c.lineWidth = Math.max(0.5, b.r * 2 * Math.pow(life, 0.9));
       c.beginPath();
       c.moveTo(a.x, a.y);
@@ -133,7 +135,7 @@ export function startTrail() {
     c.lineJoin = 'round';
 
     // fringe: accent2 trailing, accent leading, a few px either side of the travel direction
-    const f = Math.min(1.5 + speed * 5, 5);
+    const f = Math.round(Math.min(1.5 + speed * 5, 5) + (Math.random() < 0.06 ? 4 : 0));
     const fx = Math.cos(ang) * f;
     const fy = Math.sin(ang) * f;
     c.globalAlpha = 0.9;
@@ -144,7 +146,18 @@ export function startTrail() {
     c.globalAlpha = 1;
     // the ink itself
     c.fillStyle = c.strokeStyle = '#ffffff';
-    shape(now, 0, 0, ang, stretch);
+    shape(now, 0, 0, ang, stretch, true);
+
+    // glitch: on fast strokes, slice a few horizontal bands of the ink and shove them sideways
+    if (speed > 0.6 && Math.random() < 0.55) {
+      const n = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) {
+        const y = head.y + (Math.random() - 0.5) * radius * 3;
+        const h = 3 + Math.random() * 9;
+        const dx = (Math.random() - 0.5) * Math.min(speed * 30, 40);
+        c.drawImage(cv, 0, y * dpr, cv.width, h * dpr, dx, y, innerWidth, h);
+      }
+    }
 
     // over the accent band, recolour the ink to the accent so the band inverts to black, not to purple
     if (band) {
