@@ -330,12 +330,52 @@ html.is-grabbing * {
   justify-content: flex-end;
 }
 
+/* a tape of real numbers across the top of the hero */
+.ticker {
+  margin: 0 calc(var(--gutter) * -1) auto;
+  overflow: hidden;
+  border-block: 1px solid var(--line);
+  padding: var(--s2) 0;
+  color: var(--ink-dim);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  animation: tape 48s linear infinite;
+}
+.ticker__track span {
+  padding: 0 var(--s5);
+  white-space: nowrap;
+}
+.ticker__track b {
+  font-weight: 600;
+  color: var(--ink);
+}
+.ticker__track .up {
+  color: var(--lime);
+}
+.ticker__track .dn {
+  color: var(--pink);
+}
+@keyframes tape {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .ticker:hover .ticker__track {
+    animation-play-state: paused;
+  }
+}
+
 .hero__tag {
   display: flex;
   align-items: center;
   gap: var(--s2);
   color: var(--ink-dim);
-  margin-bottom: auto;
+  margin-bottom: var(--s5);
 }
 .dot {
   width: 8px;
@@ -380,6 +420,15 @@ html.is-grabbing * {
   height: auto;
   overflow: visible;
   pointer-events: none;
+}
+.hero__swash {
+  fill: none;
+  stroke: var(--lime);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
 }
 .hero__script text {
   font-family: var(--font-script);
@@ -848,7 +897,8 @@ number-flow {
   .nav {
     transition: none;
   }
-  .dot {
+  .dot,
+  .ticker__track {
     animation: none;
   }
   .about__lit .w {

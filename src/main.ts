@@ -215,9 +215,33 @@ if (term) {
   t.onSayHi = () => (window.location.href = 'mailto:mohnishk001@e.ntu.edu.sg');
 }
 
+/* ---------------- ticker ---------------- */
+const tape = [
+  ['ARBPERCEPT', '6.4 µs', 'up', 'slow path'],
+  ['MARG', '108/108', 'up', 'citations'],
+  ['SHOPILOT', '8.9×', 'up', 'vs baseline'],
+  ['SHOPILOT', '2.83', 'up', 'turns to find'],
+  ['WEATHER', 'R² 0.97', 'up', '116k obs'],
+  ['ARBPERCEPT', '1.5 µs', 'up', 'logistic prior'],
+  ['SHOPILOT', '39 ms', 'up', 'a session'],
+  ['TECHFEST QCC', '1/40', 'up', 'final round'],
+  ['SGT', '', 'dn', ''],
+];
+const tapeHTML = tape
+  .map(([k, v, d, l]) => (k === 'SGT' ? `<span>SGT <b data-sgt>--:--</b></span>` : `<span><b>${k}</b> <i class="${d}">${d === 'up' ? '▲' : '▼'} ${v}</i> ${l}</span>`))
+  .join('');
+$('[data-ticker]').innerHTML = tapeHTML + tapeHTML;
+const sgt = () =>
+  document.querySelectorAll('[data-sgt]').forEach(
+    (e) => (e.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Singapore', hour: '2-digit', minute: '2-digit' })),
+  );
+sgt();
+setInterval(sgt, 30000);
+
 /* ---------------- hero type ---------------- */
 const word = $('.hero__word');
 const wipe = $<SVGRectElement>('.hero__wipe');
+const swash = $<SVGPathElement>('.hero__swash');
 
 document.fonts.ready.then(() => {
   if (reduced) {
@@ -225,10 +249,20 @@ document.fonts.ready.then(() => {
     return;
   }
   const split = SplitText.create(word, { type: 'chars', charsClass: 'ch', mask: 'chars' });
+  gsap.set(swash, { strokeDashoffset: 1 });
   gsap
     .timeline({ delay: 0.15 })
-    .from(split.chars, { yPercent: 110, duration: 1.1, ease: 'expo.out', stagger: 0.045 })
-    .fromTo(wipe, { attr: { width: 0 } }, { attr: { width: 520 }, duration: 1.2, ease: 'power2.inOut' }, '-=0.55')
+    // letters rise in condensed and stretch out to full width as they land
+    .from(split.chars, {
+      yPercent: 110,
+      fontVariationSettings: "'wdth' 62",
+      duration: 1.2,
+      ease: 'expo.out',
+      stagger: 0.045,
+    })
+    // then the signature writes itself, and the flourish is drawn under it
+    .fromTo(wipe, { attr: { width: 0 } }, { attr: { width: 520 }, duration: 1.1, ease: 'power2.inOut' }, '-=0.6')
+    .to(swash, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' }, '-=0.25')
     .from('.hero__lede, .hero__foot, .hero__tag', { y: 16, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08 }, '-=0.9');
 
   // wordmark drifts up and spreads slightly as you leave the hero
