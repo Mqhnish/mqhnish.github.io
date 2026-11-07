@@ -474,6 +474,171 @@ html.is-grabbing * {
   font-weight: 600;
 }
 
+/* ---------- who I am ---------- */
+.who {
+  padding: var(--s10) var(--gutter) var(--s9);
+}
+@media (min-width: 1100px) {
+  .who {
+    max-width: 62%; /* the right side stays the device's stage */
+  }
+}
+.who__title {
+  font-weight: 800;
+  font-size: clamp(30px, 3.6vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  margin: var(--s5) 0 var(--s4);
+  max-width: 22ch;
+}
+.who__lede {
+  color: var(--ink-dim);
+  font-size: clamp(17px, 1.4vw, 20px);
+  max-width: 44ch;
+}
+.who__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--s5);
+  margin-top: var(--s8);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .who__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.offers,
+.watch {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-raise) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: var(--s5);
+}
+.offers__head,
+.watch__head {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-faint);
+  padding-bottom: var(--s3);
+  margin-bottom: var(--s2);
+  border-bottom: 1px dashed var(--line);
+}
+.offers__rows,
+.watch__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.offers__rows li {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  gap: var(--s3);
+  padding: 7px 0;
+  color: var(--ink-dim);
+}
+.offers__rows .no {
+  font-weight: 400;
+  color: var(--pink);
+}
+.offers__rows li:not(.offers__fill) span {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--pink) 60%, transparent);
+}
+.offers__fill {
+  margin-top: var(--s2);
+  border-top: 1px solid var(--line);
+  padding-top: var(--s3) !important;
+  color: var(--ink) !important;
+}
+.offers__fill b {
+  color: var(--lime);
+}
+.watch__rows li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 2px var(--s3);
+  padding: var(--s3) var(--s2);
+  margin: 0 calc(var(--s2) * -1);
+  border-radius: 8px;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 160ms ease;
+}
+.watch__rows li:last-child {
+  border-bottom: 0;
+}
+.watch__rows b {
+  grid-row: span 2;
+  color: var(--lime);
+  font-weight: 600;
+  padding-top: 3px;
+}
+.watch__name {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.watch__where {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s2);
+}
+.watch__where i {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: var(--mono-sm);
+  color: var(--ink-dim);
+}
+.watch__where i + i::before {
+  content: '·';
+  margin-right: var(--s2);
+  color: var(--ink-faint);
+}
+@media (max-width: 600px) {
+  .watch__where {
+    flex-direction: column;
+  }
+  .watch__where i + i::before {
+    content: none;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .watch__rows li:hover {
+    background: color-mix(in srgb, var(--lime) 8%, transparent);
+  }
+  .watch__rows li:hover .watch__where i {
+    color: var(--ink);
+  }
+}
+/* rows tick in like a feed when the section arrives */
+@media (prefers-reduced-motion: no-preference) {
+  .who:not(.is-in) .watch__rows li,
+  .who:not(.is-in) .offers__rows li {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .watch__rows li,
+  .offers__rows li {
+    transition:
+      opacity 400ms ease calc(var(--i, 0) * 70ms + 150ms),
+      transform 500ms var(--ease-out) calc(var(--i, 0) * 70ms + 150ms),
+      background-color 160ms ease;
+  }
+  .offers__rows li:nth-child(1) { --i: 0; }
+  .offers__rows li:nth-child(2) { --i: 1; }
+  .offers__rows li:nth-child(3) { --i: 2; }
+  .offers__rows li:nth-child(4) { --i: 3; }
+  .offers__rows li:nth-child(5) { --i: 5; }
+  .who.is-in .offers__fill {
+    animation: fill 1s ease 700ms both;
+  }
+}
+@keyframes fill {
+  0%, 100% { background: transparent; }
+  30% { background: color-mix(in srgb, var(--lime) 18%, transparent); }
+}
+
 /* ---------- numbers (the one lime flood) ---------- */
 .numbers {
   background: var(--lime);

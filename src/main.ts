@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
-import { projects, more, experience, awards } from './content';
+import { projects, more, experience, awards, watchlist } from './content';
 import { Terminal, type Pose } from './terminal';
 import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
@@ -79,6 +79,16 @@ document.querySelectorAll<HTMLElement>('.more__in').forEach((el) =>
     el.style.setProperty('--my', `${e.clientY - r.top}px`);
   }),
 );
+
+$('[data-watch]').innerHTML = watchlist
+  .map(
+    (w, i) => `<li style="--i:${i}"><b class="mono">${w.sym}</b><span class="watch__name">${esc(w.name)}</span><span class="watch__where">${w.where
+      .map((x) => `<i>${esc(x)}</i>`)
+      .join('')}</span></li>`,
+  )
+  .join('');
+ScrollTrigger.create({ trigger: '.who__grid', start: 'top 80%', once: true, onEnter: () => $('.who').classList.add('is-in') });
+if (reduced) document.querySelector('.who')?.classList.add('is-in');
 
 const rows = (list: { role: string; org: string; when: string }[]) =>
   list.map((r) => `<li><b>${esc(r.role)}</b><span>${esc(r.org)}</span>${r.when ? `<time>${esc(r.when)}</time>` : ''}</li>`).join('');
@@ -172,7 +182,8 @@ if (term) {
           scrollTrigger: { trigger: '.numbers', start: 'bottom 85%', end: 'bottom 5%', scrub: 0.6 },
         });
       } else {
-        // phones: the band's text runs full width, so the device fades out under it instead of being sliced
+        // phones: the who section and the band run full width, so the device fades out as the who cards
+        // arrive and comes back after the band, instead of being sliced
         gsap.fromTo(t.pose, { ...hero }, {
           ...work,
           ease: 'none',
@@ -183,7 +194,7 @@ if (term) {
           opacity: 0,
           ease: 'none',
           immediateRender: false,
-          scrollTrigger: { trigger: '.numbers', start: 'top 85%', end: 'top 40%', scrub: true },
+          scrollTrigger: { trigger: '.who', start: 'top 80%', end: 'top 30%', scrub: true },
         });
         gsap.fromTo(canvas, { opacity: 0 }, {
           opacity: 1,

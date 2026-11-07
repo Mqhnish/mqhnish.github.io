@@ -131,3 +131,13 @@ export const awards = [
   { role: 'SAT 1540 · District #1 in X and XII', org: 'Boards', when: '' },
   { role: '1st place', org: 'AFS West Zone English Debate', when: '' },
 ];
+
+/** The interests in the "who I am" section, each with where it actually shows up. */
+export const watchlist = [
+  { sym: 'QUANT', name: 'Quant trading', where: ['ArbPercept, Optiver Perceptron', 'FinTech Catalyst, NTU QFA', 'Techfest QCC final round'] },
+  { sym: 'FIN', name: 'Finance', where: ['Analyst, Nanyang Student Investment Fund', 'YieldGPT, FinTech track'] },
+  { sym: 'CNSLT', name: 'Consulting', where: ['Business Analyst, NTU MCC', '3rd, MCC Mini Case Competition'] },
+  { sym: 'STRTP', name: 'Startups', where: ['Not Yet, live side project', 'YieldGPT, built for Aspire’s case'] },
+  { sym: 'ML', name: 'Machine learning', where: ['weather-forecast-ml', 'Deep Learning Week subcommittee', 'BiasGuard research'] },
+  { sym: 'AI', name: 'AI agents', where: ['Marg', 'Shopilot', 'YieldGPT'] },
+];
