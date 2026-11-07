@@ -938,6 +938,9 @@ number-flow {
   .about__intro {
     grid-template-columns: minmax(0, 1fr);
   }
+  .spec {
+    position: static;
+  }
 }
 .about__lit {
   font-weight: 700;

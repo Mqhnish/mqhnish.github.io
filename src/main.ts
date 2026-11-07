@@ -172,7 +172,7 @@ if (term) {
       // and comes back for the sign-off, smaller, running the contact program
       const sign: Pose = desktop
         ? { px: 0.28, py: 0.04, s: 0.78, rx: 0.1, ry: -0.42, rz: 0.05 }
-        : { px: 0, py: -0.22, s: 0.5, rx: 0.08, ry: -0.24, rz: 0.03 };
+        : { px: 0, py: -0.27, s: 0.46, rx: 0.08, ry: -0.24, rz: 0.03 };
       gsap.fromTo(t.pose, { ...sign, py: sign.py + 0.45, ry: sign.ry - 0.9 }, {
         ...sign,
         ease: 'none',
