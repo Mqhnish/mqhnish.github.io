@@ -153,6 +153,10 @@ export class Terminal {
   private themed: ((t: Theme) => void)[] = []; // redraws anything that carries an accent colour
   private rim!: THREE.PointLight;
   private warm!: THREE.PointLight;
+  private frame = 0;
+  private maxPr = 2; // lowered on slow machines
+  private dtAvg = 1 / 60;
+  private dtCount = 0;
   private meteor = new THREE.PointLight('#ffffff', 0, 16, 1.6); // follows the shooting star
   private meteorPos = new THREE.Vector3();
   private pmrem!: THREE.PMREMGenerator;
@@ -550,7 +554,7 @@ export class Terminal {
   private resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const pr = Math.min(window.devicePixelRatio, 2);
+    const pr = Math.min(window.devicePixelRatio, this.maxPr);
     this.renderer.setPixelRatio(pr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(pr);
@@ -690,8 +694,20 @@ export class Terminal {
 
     (this.led.material as THREE.MeshBasicMaterial).color.copy(Math.floor(time / 700) % 2 ? this.ledOn : this.ledOff);
 
-    this.screen.draw(time);
-    this.screenTex.needsUpdate = true;
+    // the screen redraws at 30 fps: half the texture uploads, and nobody reads an order book faster
+    this.frame++;
+    if (this.frame % 2 === 0) {
+      this.screen.draw(time);
+      this.screenTex.needsUpdate = true;
+    }
+
+    // if frames keep running slow, render at a lower pixel ratio (2 -> 1.5 -> 1)
+    this.dtAvg += (dt - this.dtAvg) * 0.02;
+    if (++this.dtCount > 240 && this.dtAvg > 1 / 42 && this.maxPr > 1) {
+      this.maxPr -= 0.5;
+      this.dtCount = 0;
+      this.resize();
+    }
     this.composer.render(dt);
   }
 }

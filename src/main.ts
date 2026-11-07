@@ -6,12 +6,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 import { projects, more, experience, awards, watchlist } from './content';
-import { Terminal, type Pose } from './terminal';
+import type { Terminal, Pose } from './terminal';
 import { screenLabels } from './screens';
 import { startTrail, startField } from './trail';
 import { themes, current, applyTheme } from './theme';
 import { figures } from './charts';
-import { startSky } from './sky';
+import { startSky, setSkyActive } from './sky';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -115,20 +115,25 @@ if (!reduced) {
 }
 
 /* ---------------- terminal ---------------- */
-let term: Terminal | null = null;
-try {
-  term = new Terminal($<HTMLCanvasElement>('#terminal'), reduced);
-} catch {
-  $('#terminal').remove(); // no WebGL: the page still reads fine without the device
-}
-
 const label = $('[data-screen-label]');
 startSky();
 startField();
 startTrail();
 
-if (term) {
-  const t = term;
+// three.js is its own chunk: the text and the hero intro come up first, the device follows
+import('./terminal').then(({ Terminal }) => {
+  let term: Terminal;
+  try {
+    term = new Terminal($<HTMLCanvasElement>('#terminal'), reduced);
+  } catch {
+    $('#terminal').remove(); // no WebGL: the page still reads fine without the device
+    return;
+  }
+  setupTerminal(term);
+  ScrollTrigger.refresh();
+});
+
+function setupTerminal(t: Terminal) {
   const canvas = $<HTMLCanvasElement>('#terminal');
   t.onModeChange = (m) => (label.textContent = screenLabels[m]);
   if (import.meta.env.DEV) (window as unknown as { __term: Terminal }).__term = t;
@@ -148,7 +153,7 @@ if (term) {
       const roomy = !desktop && window.innerWidth / window.innerHeight > 0.75 ? 1.14 : 1;
       const hero: Pose = desktop
         ? { px: 0.3, py: -0.1, s: 0.9, rx: 0.14, ry: -0.5, rz: 0.08 }
-        : { px: 0.03, py: roomy > 1 ? -0.24 : -0.17, s: 0.62 * roomy, rx: 0.1, ry: -0.36, rz: 0.06 };
+        : { px: 0.03, py: roomy > 1 ? -0.24 : -0.16, s: roomy > 1 ? 0.62 * roomy : 0.58, rx: 0.1, ry: -0.36, rz: 0.06 };
       const work: Pose = desktop
         ? { px: 0.25, py: 0, s: 0.92, rx: 0.06, ry: -0.3, rz: 0.02 }
         : { px: 0, py: -0.24, s: 0.68 * roomy, rx: 0.05, ry: -0.16, rz: 0 };
@@ -278,7 +283,10 @@ if (term) {
     start: 'top top',
     endTrigger: '.contact',
     end: 'top bottom',
-    onToggle: (self) => (t.visible = !self.isActive),
+    onToggle: (self) => {
+      t.visible = !self.isActive;
+      setSkyActive(!self.isActive);
+    },
   });
 
   // contact: the screen switches to the sign-off program, BUY opens mail

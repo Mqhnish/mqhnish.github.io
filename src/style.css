@@ -10,7 +10,9 @@
   --pink: #ff8a9e;
 
   --font-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace; /* only inside the terminal's screen now */
+  /* small labels, tags and captions: Archivo stretched wide, the same family as the headlines */
+  --font-label: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --font-script: 'Yellowtail', 'Brush Script MT', cursive;
 
   /* 8pt spacing scale */
@@ -79,10 +81,37 @@ p {
 }
 
 .mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
   font-size: var(--mono);
   line-height: 1.5;
   letter-spacing: 0.01em;
+}
+/* short labels go uppercase with open tracking; longer captions stay in sentence case */
+.chapter,
+.pill,
+.hero__tag,
+.hero__foot,
+.ticker,
+.project__count,
+.project__event,
+.project__stack li,
+.project__stats span,
+.more__item .mono,
+.label,
+.rows time,
+.offers__head,
+.watch__head,
+.watch__rows b,
+.spec__head,
+.spec dt,
+.btn,
+.foot,
+.numbers .chapter {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .sr-only {
@@ -103,7 +132,9 @@ p {
   color: var(--lime-ink);
   padding: var(--s2) var(--s4);
   border-radius: 99px;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono);
 }
 .skip:focus {
@@ -149,6 +180,10 @@ main > section {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+/* on dark themes the night sky is the ambience; the dot field only runs on the light theme */
+html:not(.is-light) .field {
+  display: none;
 }
 .field__l,
 .field__p {
@@ -260,7 +295,9 @@ html.is-grabbing * {
   color: var(--ink);
 }
 .nav__mark span {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-weight: 400;
   font-size: 11px;
   letter-spacing: 0;
@@ -274,7 +311,9 @@ html.is-grabbing * {
 }
 
 .pill {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono-sm);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -594,7 +633,9 @@ html.is-grabbing * {
 }
 .watch__where i {
   font-style: normal;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono-sm);
   color: var(--ink-dim);
 }
@@ -703,7 +744,9 @@ html.is-grabbing * {
 }
 .stat i {
   font-style: normal;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
   font-size: 0.32em;
   letter-spacing: 0;
@@ -719,7 +762,9 @@ html.is-grabbing * {
   color: var(--lime-ink);
 }
 .fig__lbl {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: 9.5px;
   fill: currentColor;
   opacity: 0.72;
@@ -860,14 +905,18 @@ number-flow {
 }
 .project__stats b {
   display: block;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: clamp(18px, 1.8vw, 24px);
   font-weight: 600;
   color: var(--lime);
   letter-spacing: -0.02em;
 }
 .project__stats span {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono-sm);
   color: var(--ink-dim);
 }
@@ -880,7 +929,9 @@ number-flow {
   margin: 0 0 var(--s6);
 }
 .project__stack li {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono-sm);
   color: var(--ink-dim);
   border: 1px solid var(--line);
@@ -896,7 +947,9 @@ number-flow {
   display: inline-flex;
   align-items: center;
   gap: var(--s2);
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono);
   text-decoration: none;
   padding: 10px 18px;
@@ -1012,7 +1065,9 @@ number-flow {
 }
 .more__arrow {
   margin-left: auto;
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-faint);
   transition:
     transform 200ms var(--ease-out),
@@ -1223,7 +1278,9 @@ number-flow {
   grid-column: 1;
 }
 .rows time {
-  font-family: var(--font-mono);
+  font-family: var(--font-label);
+  font-variation-settings: 'wdth' 125;
+  font-variant-numeric: tabular-nums;
   font-size: var(--mono-sm);
   color: var(--ink-faint);
   grid-row: 1;
@@ -1308,6 +1365,22 @@ number-flow {
 }
 
 /* ---------- mobile ---------- */
+@media (max-width: 600px) {
+  /* wide letters run long on a phone: labels drop a size and close up their tracking */
+  :root {
+    --mono: 11.5px;
+    --mono-sm: 11px;
+  }
+  .mono,
+  .hero__tag {
+    font-variation-settings: 'wdth' 112;
+  }
+  .hero__tag,
+  .project__stats span,
+  .ticker {
+    letter-spacing: 0.03em;
+  }
+}
 @media (max-width: 820px) {
   .nav {
     padding: var(--s4) var(--gutter);

@@ -7,6 +7,9 @@ import { current, type Theme } from './theme';
  * device as it passes. Dark themes only; static stars with reduced motion.
  */
 export const skyLight = { x: 0, y: 0, i: 0, color: '#ffffff' }; // x, y in viewport px; i 0..1
+let active = true;
+/** Pause drawing while opaque sections cover the sky. */
+export const setSkyActive = (on: boolean) => (active = on);
 
 interface Star {
   x: number; // 0..1 of viewport
@@ -38,6 +41,8 @@ export function startSky() {
   let H = 0;
   let dpr = 1;
   let stars: Star[] = [];
+  let twinklers: Star[] = []; // only the brighter stars twinkle; the rest are baked into one bitmap
+  const layer = document.createElement('canvas');
   let cons: { pts: [number, number][]; edges: [number, number][] }[] = [];
 
   const build = () => {
@@ -46,14 +51,30 @@ export function startSky() {
     H = innerHeight;
     cv.width = W * dpr;
     cv.height = H * dpr;
-    const n = Math.round((W * H) / (W < 700 ? 5200 : 3800));
+    const n = Math.round((W * H) / (W < 700 ? 9000 : 6500));
     stars = Array.from({ length: n }, () => ({
       x: Math.random(),
       y: Math.random() * 0.92,
       r: Math.random() < 0.08 ? rnd(1.1, 1.6) : rnd(0.4, 0.9),
-      a: rnd(0.18, 0.7),
+      a: rnd(0.12, 0.55),
       tw: Math.random() * Math.PI * 2,
     }));
+    // bake the still stars once per resize
+    layer.width = cv.width;
+    layer.height = cv.height;
+    const lc = layer.getContext('2d')!;
+    lc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    twinklers = [];
+    for (const st of stars) {
+      if (st.r > 0.8 || Math.random() < 0.12) {
+        twinklers.push(st);
+        continue;
+      }
+      lc.fillStyle = `rgba(238,242,236,${st.a.toFixed(3)})`;
+      lc.beginPath();
+      lc.arc(st.x * W, st.y * H, st.r, 0, Math.PI * 2);
+      lc.fill();
+    }
     // constellations: small hand-shaped groups of 4-6 stars, placed loosely around the edges
     const shapes: [number, number][][] = [
       [[0, 0], [0.05, 0.04], [0.11, 0.03], [0.16, 0.08], [0.13, 0.15], [0.19, 0.17]],
@@ -62,12 +83,11 @@ export function startSky() {
       [[0, 0.1], [0.05, 0.05], [0.1, 0.07], [0.15, 0], [0.2, 0.04]],
     ];
     const spots: [number, number][] = [
-      [0.06, 0.16],
-      [0.58, 0.08],
-      [0.78, 0.62],
-      [0.3, 0.7],
+      [0.62, 0.06],
+      [0.8, 0.66],
+      [0.04, 0.08],
     ];
-    cons = shapes.map((sh, k) => {
+    cons = shapes.slice(0, spots.length).map((sh, k) => {
       const [ox, oy] = spots[k];
       const s = W < 700 ? 1.6 : 1;
       const pts = sh.map(([x, y]) => [ox + x * s * 0.9, oy + y * s * (W / H) * 0.9] as [number, number]);
@@ -130,8 +150,11 @@ export function startSky() {
     c.clearRect(0, 0, W, H);
     if (!dark) return;
 
-    // stars
-    for (const s of stars) {
+    // stars: the baked layer plus the few that twinkle
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.drawImage(layer, 0, 0);
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (const s of twinklers) {
       const tw = reduced ? 1 : 0.65 + 0.35 * Math.sin(now * 0.0012 + s.tw);
       c.fillStyle = `rgba(238,242,236,${(s.a * tw).toFixed(3)})`;
       c.beginPath();
@@ -146,7 +169,7 @@ export function startSky() {
       const cy = px.reduce((a, p) => a + p[1], 0) / px.length;
       const near = Math.max(0, 1 - Math.hypot(ptr.x - cx, ptr.y - cy) / 260);
       c.lineWidth = 1;
-      c.strokeStyle = near > 0.02 ? hexA(A1, 0.18 + near * 0.55) : 'rgba(238,242,236,0.18)';
+      c.strokeStyle = near > 0.02 ? hexA(A1, 0.18 + near * 0.55) : 'rgba(238,242,236,0.11)';
       c.beginPath();
       for (const [a, b] of k.edges) {
         c.moveTo(px[a][0], px[a][1]);
@@ -154,7 +177,7 @@ export function startSky() {
       }
       c.stroke();
       for (const [x, y] of px) {
-        c.fillStyle = near > 0.02 ? hexA(A1, 0.55 + near * 0.45) : 'rgba(238,242,236,0.75)';
+        c.fillStyle = near > 0.02 ? hexA(A1, 0.55 + near * 0.45) : 'rgba(238,242,236,0.5)';
         c.beginPath();
         c.arc(x, y, 1.7 + near * 1.2, 0, Math.PI * 2);
         c.fill();
@@ -211,7 +234,8 @@ export function startSky() {
   };
 
   const loop = (now: number) => {
-    draw(now);
+    if (active) draw(now);
+    else skyLight.i = 0;
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
