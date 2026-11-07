@@ -46,14 +46,39 @@ $('[data-projects]').innerHTML = projects
   )
   .join('');
 
+// a small drawing per card: grey at rest, it lights up in the accent and moves on hover
+const glyphs = [
+  // BiasGuard: two skewed distributions pulled into line
+  `<path d="M4 40 C 24 40 30 8 46 8 S 70 40 92 40" class="g g--a" /><path d="M28 40 C 48 40 54 14 70 14 S 94 40 116 40" class="g g--b" />`,
+  // weather-forecast-ml: points around a fitted line
+  `${[[10, 34], [22, 30], [30, 32], [44, 24], [52, 27], [66, 20], [76, 18], [88, 14], [100, 12], [110, 8]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="2.2" class="g--dot" style="--i:${i}" />`).join('')}<path d="M4 37 L 116 7" class="g g--fit" pathLength="1" />`,
+  // multimodal: three inputs fused late into one
+  `<path d="M4 8 H40 C 60 8 60 24 80 24 H116" class="g" /><path d="M4 24 H116" class="g" /><path d="M4 40 H40 C 60 40 60 24 80 24" class="g" /><circle cx="80" cy="24" r="4" class="g--node" />`,
+  // orbital mechanics: a transfer orbit and a craft on it
+  `<g class="g--orbit"><ellipse cx="60" cy="24" rx="52" ry="17" class="g" /><circle cx="60" cy="24" r="6" class="g--node" /><circle cx="112" cy="24" r="3" class="g--sat" /></g>`,
+  // Vyoma and SolarGrid: a field of panels
+  `${Array.from({ length: 24 }, (_, i) => `<rect x="${4 + (i % 12) * 9.6}" y="${10 + Math.floor(i / 12) * 15}" width="7" height="11" rx="1" class="g--cell" style="--i:${i}" />`).join('')}`,
+  // Extinction 101: an impactor coming in over the horizon
+  `<path d="M2 44 Q 60 28 118 44" class="g" /><path d="M104 2 L 66 33" class="g g--fit" pathLength="1" /><circle cx="66" cy="34" r="3.5" class="g--node" />`,
+];
 $('[data-more]').innerHTML = more
-  .map((m) => {
-    const inner = `<p class="mono">${esc(m.meta)}</p><h3>${esc(m.name)}</h3><p>${esc(m.text)}</p>`;
+  .map((m, i) => {
+    const art = `<svg class="more__art" viewBox="0 0 120 48" aria-hidden="true">${glyphs[i] ?? ''}</svg>`;
+    const inner = `${art}<p class="mono">${esc(m.meta)}</p><h3>${esc(m.name)}</h3><p>${esc(m.text)}</p>`;
+    const cls = `more__item${i === 0 || i === 3 || i === 5 ? ' more__item--wide' : ''}`;
     return m.href
-      ? `<li><a class="more__item" href="${m.href}" target="_blank" rel="noopener">${inner.replace('</h3>', ' <span class="more__arrow" aria-hidden="true">↗</span></h3>')}</a></li>`
-      : `<li><div class="more__item">${inner}</div></li>`;
+      ? `<li class="${cls}"><a class="more__in" href="${m.href}" target="_blank" rel="noopener">${inner.replace('</h3>', ' <span class="more__arrow" aria-hidden="true">↗</span></h3>')}</a></li>`
+      : `<li class="${cls}"><div class="more__in">${inner}</div></li>`;
   })
   .join('');
+// spotlight follows the pointer inside each card
+document.querySelectorAll<HTMLElement>('.more__in').forEach((el) =>
+  el.addEventListener('pointermove', (e) => {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  }),
+);
 
 const rows = (list: { role: string; org: string; when: string }[]) =>
   list.map((r) => `<li><b>${esc(r.role)}</b><span>${esc(r.org)}</span>${r.when ? `<time>${esc(r.when)}</time>` : ''}</li>`).join('');
@@ -232,12 +257,22 @@ const tapeHTML = tape
   .map(([k, v, d, l]) => (k === 'SGT' ? `<span>SGT <b data-sgt>--:--</b></span>` : `<span><b>${k}</b> <i class="${d}">${d === 'up' ? '▲' : '▼'} ${v}</i> ${l}</span>`))
   .join('');
 $('[data-ticker]').innerHTML = tapeHTML + tapeHTML;
-const sgt = () =>
-  document.querySelectorAll('[data-sgt]').forEach(
-    (e) => (e.textContent = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Singapore', hour: '2-digit', minute: '2-digit' })),
+const sgt = () => {
+  const now = new Date();
+  const hm = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Singapore', hour: '2-digit', minute: '2-digit' });
+  document.querySelectorAll('[data-sgt]').forEach((e) => (e.textContent = hm));
+  document.querySelectorAll('[data-sgt-full]').forEach(
+    (e) => (e.textContent = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Singapore', hour12: false }) + ' SGT'),
   );
+};
 sgt();
-setInterval(sgt, 30000);
+setInterval(sgt, 1000);
+// months since the move (August 2026), so the spec sheet never goes stale
+{
+  const n = new Date();
+  const months = Math.max(0, (n.getFullYear() - 2026) * 12 + n.getMonth() - 7);
+  document.querySelectorAll('[data-months]').forEach((e) => (e.textContent = months <= 1 ? 'since August 2026' : `${months} months, since August 2026`));
+}
 
 /* ---------------- hero type ---------------- */
 const word = $('.hero__word');
