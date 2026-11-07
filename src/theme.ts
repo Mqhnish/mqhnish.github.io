@@ -33,7 +33,7 @@ export const themes: Theme[] = [
     line: 'rgba(238,244,248,0.14)',
     accent: '#3df6ff',
     onAccent: '#06080b',
-    accent2: '#ff3d9e',
+    accent2: '#ff5ab8',
     light: false,
   },
   {
