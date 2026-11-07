@@ -130,6 +130,10 @@ main > section {
   position: relative;
   z-index: 2;
 }
+/* while the lime band passes on desktop, the device rides in front of it */
+#terminal.is-front {
+  z-index: 3;
+}
 
 /* ---------- ambience + cursor ---------- */
 .field {
@@ -477,6 +481,15 @@ html.is-grabbing * {
   clip-path: polygon(0 5vw, 100% 0, 100% calc(100% - 5vw), 0 100%);
   margin: var(--s7) 0;
   padding: calc(var(--s10) + 5vw) var(--gutter);
+}
+/* on wide screens the band's content keeps to the left, the right side is the device's stage */
+@media (min-width: 1100px) {
+  .numbers__inner {
+    max-width: 58%;
+  }
+  .numbers__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .numbers .chapter,
 .numbers .chapter span {

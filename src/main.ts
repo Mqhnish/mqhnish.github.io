@@ -132,12 +132,14 @@ if (term) {
     { desktop: '(min-width: 821px)', mobile: '(max-width: 820px)' },
     (ctx) => {
       const { desktop } = ctx.conditions as { desktop: boolean };
+      // the phone layout on a squarer window (tablet, narrow desktop pane) has room for a bigger device
+      const roomy = !desktop && window.innerWidth / window.innerHeight > 0.75 ? 1.14 : 1;
       const hero: Pose = desktop
-        ? { px: 0.3, py: -0.12, s: 0.82, rx: 0.14, ry: -0.5, rz: 0.08 }
-        : { px: 0.03, py: -0.17, s: 0.62, rx: 0.1, ry: -0.36, rz: 0.06 };
+        ? { px: 0.3, py: -0.1, s: 0.9, rx: 0.14, ry: -0.5, rz: 0.08 }
+        : { px: 0.03, py: roomy > 1 ? -0.24 : -0.17, s: 0.62 * roomy, rx: 0.1, ry: -0.36, rz: 0.06 };
       const work: Pose = desktop
         ? { px: 0.25, py: 0, s: 0.92, rx: 0.06, ry: -0.3, rz: 0.02 }
-        : { px: 0, py: -0.24, s: 0.68, rx: 0.05, ry: -0.16, rz: 0 };
+        : { px: 0, py: -0.24, s: 0.68 * roomy, rx: 0.05, ry: -0.16, rz: 0 };
 
       if (!reduced) {
         // entrance: rises in and settles, once, on load
@@ -147,12 +149,49 @@ if (term) {
         Object.assign(t.pose, hero);
       }
 
-      gsap.fromTo(t.pose, { ...hero }, {
-        ...work,
-        ease: 'none',
-        immediateRender: false,
-        scrollTrigger: { trigger: '.numbers', start: 'top 80%', end: () => `+=${window.innerHeight * 1.2}`, scrub: true },
-      });
+      if (desktop) {
+        // desktop: the device stays in front of the lime band the whole way through, parks in the open
+        // space beside the heading, then grows into its work position as the band leaves. One move, no cut.
+        const band: Pose = { px: 0.27, py: -0.02, s: 0.86, rx: 0.1, ry: -0.42, rz: 0.06 };
+        ScrollTrigger.create({
+          trigger: '.numbers',
+          start: 'top bottom',
+          end: 'bottom top',
+          onToggle: (self) => canvas.classList.toggle('is-front', self.isActive),
+        });
+        gsap.fromTo(t.pose, { ...hero }, {
+          ...band,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.numbers', start: 'top 90%', end: 'top 5%', scrub: 0.6 },
+        });
+        gsap.fromTo(t.pose, { ...band }, {
+          ...work,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.numbers', start: 'bottom 85%', end: 'bottom 5%', scrub: 0.6 },
+        });
+      } else {
+        // phones: the band's text runs full width, so the device fades out under it instead of being sliced
+        gsap.fromTo(t.pose, { ...hero }, {
+          ...work,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.numbers', start: 'top 80%', end: () => `+=${window.innerHeight * 1.2}`, scrub: 0.6 },
+        });
+        gsap.fromTo(canvas, { opacity: 1 }, {
+          opacity: 0,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.numbers', start: 'top 85%', end: 'top 40%', scrub: true },
+        });
+        gsap.fromTo(canvas, { opacity: 0 }, {
+          opacity: 1,
+          ease: 'none',
+          immediateRender: false,
+          scrollTrigger: { trigger: '.numbers', start: 'bottom 75%', end: 'bottom 25%', scrub: true },
+        });
+      }
 
       // leaving the work section: the device sinks and fades out instead of being cut off by the next section
       gsap.fromTo(t.pose, { ...work }, {
