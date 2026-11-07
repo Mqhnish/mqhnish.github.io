@@ -1,6 +1,9 @@
 import { rgba } from './theme';
 import type { ScreenMode } from './content';
 
+/** A project program, or the sign-off program shown in the contact section. */
+export type Program = ScreenMode | 'hello';
+
 /**
  * Draws the terminal's screen into a 2D canvas, one "program" per project.
  * The canvas becomes a Three.js texture, so everything here is plain 2D drawing.
@@ -323,26 +326,84 @@ function drawYield(c: Ctx, time: number) {
   }
 }
 
-const programs: Record<ScreenMode, (c: Ctx, t: number) => void> = {
+/* ---------------- sign-off: a shell session that types out how to reach me ---------------- */
+const hello = { start: 0, clock: '', clockAt: 0 };
+const HELLO_LINES: { t: string; col?: 'lime' | 'pink' | 'dim'; pad?: number }[] = [
+  { t: '> whoami' },
+  { t: "  mohnish singh rawat · cs @ ntu '30", col: 'dim' },
+  { t: '> status' },
+  { t: '  ● open to quant internships', col: 'lime' },
+  { t: '> contact --list' },
+  { t: '  mail     mohnishk001@e.ntu.edu.sg', col: 'dim' },
+  { t: '  github   mqhnish', col: 'dim' },
+  { t: '  linkedin mohnishsrawat', col: 'dim' },
+];
+
+function drawHello(c: Ctx, time: number) {
+  if (time - hello.clockAt > 1000) {
+    hello.clock = new Date().toLocaleTimeString('en-GB', { timeZone: 'Asia/Singapore', hour12: false });
+    hello.clockAt = time;
+  }
+  header(c, 'mohnish@msr-01 ~', `SGT ${hello.clock}`);
+  // type the session out, ~28 ms a character, commands a little slower than output
+  let budget = Math.max(0, (time - hello.start) / 26);
+  c.font = MONO_SM;
+  HELLO_LINES.forEach((l, i) => {
+    if (budget <= 0) return;
+    const n = Math.min(l.t.length, Math.floor(budget));
+    budget -= l.t.length + (l.col ? 4 : 14);
+    c.fillStyle = l.col === 'lime' ? LIME : l.col === 'dim' ? DIM : INK;
+    c.fillText(l.t.slice(0, n), 28, 92 + i * 34);
+  });
+  // the call to action, once the session has finished typing
+  if (budget > 0) {
+    const y = 404;
+    c.fillStyle = FAINT;
+    c.fillRect(28, y - 26, SCREEN_W - 56, 1);
+    c.font = MONO;
+    c.fillStyle = INK;
+    c.fillText('press', 28, y + 40);
+    const bx = 136;
+    c.fillStyle = LIME;
+    c.fillRect(bx, y + 6, 96, 48);
+    c.fillStyle = BG;
+    c.textAlign = 'center';
+    c.fillText('BUY', bx + 48, y + 40);
+    c.textAlign = 'left';
+    c.fillStyle = INK;
+    c.fillText('to say hi', bx + 116, y + 40);
+    if (Math.floor(time / 530) % 2) {
+      c.fillStyle = LIME;
+      c.fillRect(bx + 116 + c.measureText('to say hi').width + 10, y + 16, 16, 30);
+    }
+    c.font = MONO_SM;
+    c.fillStyle = DIM;
+    c.fillText('or drag me around. i was built for this.', 28, y + 104);
+  }
+}
+
+const programs: Record<Program, (c: Ctx, t: number) => void> = {
   arb: drawArb,
   shopilot: drawShop,
   marg: drawMarg,
   notyet: drawNotYet,
   yieldgpt: drawYield,
+  hello: drawHello,
 };
 
-export const screenLabels: Record<ScreenMode, string> = {
+export const screenLabels: Record<Program, string> = {
   arb: 'arbpercept.live',
   shopilot: 'shopilot.session',
   marg: 'marg.guide',
   notyet: 'notyet.plan',
   yieldgpt: 'yieldgpt.audit',
+  hello: 'hello.sh',
 };
 
 export class Screen {
   readonly canvas: HTMLCanvasElement;
   private ctx: Ctx;
-  private mode: ScreenMode = 'arb';
+  private mode: Program = 'arb';
   private switchAt = -1e9;
 
   constructor() {
@@ -363,9 +424,10 @@ export class Screen {
     return this.mode;
   }
 
-  setMode(mode: ScreenMode, now: number) {
+  setMode(mode: Program, now: number) {
     if (mode === this.mode) return;
     this.mode = mode;
+    if (mode === 'hello') hello.start = now + 260; // start typing once the switch glitch clears
     this.switchAt = now;
   }
 

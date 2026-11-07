@@ -91,6 +91,7 @@ startTrail();
 
 if (term) {
   const t = term;
+  const canvas = $<HTMLCanvasElement>('#terminal');
   t.onModeChange = (m) => (label.textContent = screenLabels[m]);
   if (import.meta.env.DEV) (window as unknown as { __term: Terminal }).__term = t;
   let last = performance.now();
@@ -106,7 +107,7 @@ if (term) {
     (ctx) => {
       const { desktop } = ctx.conditions as { desktop: boolean };
       const hero: Pose = desktop
-        ? { px: 0.27, py: -0.03, s: 0.98, rx: 0.14, ry: -0.5, rz: 0.08 }
+        ? { px: 0.3, py: -0.12, s: 0.82, rx: 0.14, ry: -0.5, rz: 0.08 }
         : { px: 0.03, py: -0.17, s: 0.62, rx: 0.1, ry: -0.36, rz: 0.06 };
       const work: Pose = desktop
         ? { px: 0.25, py: 0, s: 0.92, rx: 0.06, ry: -0.3, rz: 0.02 }
@@ -127,12 +128,36 @@ if (term) {
         scrollTrigger: { trigger: '.numbers', start: 'top 80%', end: () => `+=${window.innerHeight * 1.2}`, scrub: true },
       });
 
-      gsap.to(t.pose, {
-        py: desktop ? -1.1 : -0.9,
-        ry: work.ry + 0.8,
+      // leaving the work section: the device sinks and fades out instead of being cut off by the next section
+      gsap.fromTo(t.pose, { ...work }, {
+        py: work.py - 0.35,
+        ry: work.ry + 0.6,
         ease: 'none',
         immediateRender: false,
-        scrollTrigger: { trigger: '.more', start: 'top bottom', end: 'top 30%', scrub: true },
+        scrollTrigger: { trigger: '.more', start: 'top bottom', end: 'top 35%', scrub: true },
+      });
+      gsap.fromTo(canvas, { opacity: 1 }, {
+        opacity: 0,
+        ease: 'none',
+        immediateRender: false,
+        scrollTrigger: { trigger: '.more', start: 'top 95%', end: 'top 45%', scrub: true },
+      });
+
+      // and comes back for the sign-off, smaller, running the contact program
+      const sign: Pose = desktop
+        ? { px: 0.28, py: 0.04, s: 0.78, rx: 0.1, ry: -0.42, rz: 0.05 }
+        : { px: 0, py: -0.22, s: 0.5, rx: 0.08, ry: -0.24, rz: 0.03 };
+      gsap.fromTo(t.pose, { ...sign, py: sign.py + 0.45, ry: sign.ry - 0.9 }, {
+        ...sign,
+        ease: 'none',
+        immediateRender: false,
+        scrollTrigger: { trigger: '.contact', start: 'top bottom', end: 'top 15%', scrub: true },
+      });
+      gsap.fromTo(canvas, { opacity: 0 }, {
+        opacity: 1,
+        ease: 'none',
+        immediateRender: false,
+        scrollTrigger: { trigger: '.contact', start: 'top 85%', end: 'top 35%', scrub: true },
       });
 
       document.querySelectorAll<HTMLElement>('.project').forEach((el, i) => {
@@ -169,13 +194,25 @@ if (term) {
     },
   });
 
-  // stop rendering once the opaque sections cover the viewport
+  // stop rendering while the opaque middle sections cover the viewport
   ScrollTrigger.create({
     trigger: '.more',
     start: 'top top',
-    end: 'max',
+    endTrigger: '.contact',
+    end: 'top bottom',
     onToggle: (self) => (t.visible = !self.isActive),
   });
+
+  // contact: the screen switches to the sign-off program, BUY opens mail
+  ScrollTrigger.create({
+    trigger: '.contact',
+    start: 'top 70%',
+    onEnter: () => {
+      t.setMode('hello');
+      label.textContent = screenLabels.hello;
+    },
+  });
+  t.onSayHi = () => (window.location.href = 'mailto:mohnishk001@e.ntu.edu.sg');
 }
 
 /* ---------------- hero type ---------------- */
@@ -242,8 +279,18 @@ picker.addEventListener('keydown', (e) => {
   e.preventDefault();
 });
 
-/* ---------------- nav colour over the lime band ---------------- */
+/* ---------------- nav: frosted once scrolled, hides while reading down ---------------- */
 const nav = $('.nav');
+ScrollTrigger.create({
+  start: 0,
+  end: 'max',
+  onUpdate: (self) => {
+    const y = self.scroll();
+    nav.classList.toggle('is-scrolled', y > 40);
+    const hide = self.direction === 1 && y > window.innerHeight * 0.6 && !nav.contains(document.activeElement);
+    nav.classList.toggle('is-hidden', hide);
+  },
+});
 ScrollTrigger.create({
   trigger: '.numbers',
   start: () => `top ${nav.offsetHeight / 2}px`,

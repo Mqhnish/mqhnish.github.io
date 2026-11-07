@@ -192,7 +192,39 @@ html.is-grabbing * {
   justify-content: space-between;
   align-items: center;
   padding: var(--s5) var(--gutter);
-  transition: color 200ms ease;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    transform 320ms var(--ease-out);
+}
+/* once you scroll, the nav gets a frosted bar so text never runs through it; it tucks away while reading */
+.nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.nav.is-scrolled::before {
+  opacity: 1;
+}
+.nav.is-on-lime::before {
+  background: color-mix(in srgb, var(--lime) 70%, transparent);
+  border-color: color-mix(in srgb, var(--lime-ink) 20%, transparent);
+}
+.nav.is-hidden {
+  transform: translateY(-100%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .nav::before {
+    background: var(--bg);
+    backdrop-filter: none;
+  }
 }
 /* over the lime band the nav flips to black, set from main.ts */
 .nav.is-on-lime .nav__mark,
@@ -709,8 +741,17 @@ number-flow {
 }
 
 /* ---------- contact ---------- */
+/* see-through, so the returning terminal and the dot field sit behind it */
 .contact {
+  background: transparent;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
   padding-bottom: var(--s6);
+}
+.contact .foot {
+  margin-top: auto;
 }
 .contact__big {
   margin: var(--s7) 0 var(--s8);
@@ -789,6 +830,12 @@ number-flow {
     padding: 58vh 0 var(--s9);
     align-items: flex-start;
   }
+  .contact {
+    padding-top: 56vh;
+  }
+  .contact__big {
+    margin-top: var(--s5);
+  }
   .project__card {
     background: var(--bg);
     padding-top: var(--s5);
@@ -798,6 +845,9 @@ number-flow {
 
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
+  .nav {
+    transition: none;
+  }
   .dot {
     animation: none;
   }

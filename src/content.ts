@@ -108,7 +108,7 @@ export const projects: Project[] = [
 
 export const more = [
   { name: 'BiasGuard', meta: 'NYAS Junior Academy · research lead', text: 'Bias detection and mitigation for large AI systems. Presented internationally.' },
-  { name: 'weather-forecast-ml', meta: 'IIT Bombay Techfest · top 20', text: 'Random forests on 116k observations. R² 0.970 for temperature.', href: 'https://github.com/mqhnish/weather-forecast-ml' },
+  { name: 'weather-forecast-ml', meta: 'IIT Bombay Techfest · top 20', text: 'Random forests on 116k observations. R² 0.97 for temperature.', href: 'https://github.com/mqhnish/weather-forecast-ml' },
   { name: 'multimodal-toxic-detector', meta: 'Personal', text: 'Text, image and audio classifiers combined by late fusion.', href: 'https://github.com/mqhnish/multimodal-toxic-detector' },
   { name: 'orbital-mechanics', meta: 'Personal', text: 'Delta-v manoeuvres and transfers around the Earth and Moon.', href: 'https://github.com/mqhnish/orbital-mechanics-simulations' },
   { name: 'Vyoma and SolarGrid', meta: 'NYAS Junior Academy · co-author', text: 'A systems model for a Mars settlement, and solar plan optimisation.' },

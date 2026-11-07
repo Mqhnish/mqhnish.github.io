@@ -8,6 +8,7 @@ import { Screen, setScreenTheme } from './screens';
 import { current, type Theme } from './theme';
 import { ThermalGlitchShader } from './fx';
 import type { ScreenMode } from './content';
+import type { Program } from './screens';
 
 /**
  * The pocket trading terminal. GSAP drives `pose` from scroll; the render loop
@@ -126,7 +127,9 @@ interface Satellite {
 export class Terminal {
   readonly pose: Pose = { px: 0.27, py: 0, s: 1, rx: 0.12, ry: -0.5, rz: 0.06 };
   visible = true;
-  onModeChange: (m: ScreenMode) => void = () => {};
+  onModeChange: (m: Program) => void = () => {};
+  /** BUY on the contact screen */
+  onSayHi: () => void = () => {};
 
   private renderer: THREE.WebGLRenderer;
   private composer: EffectComposer;
@@ -510,14 +513,17 @@ export class Terminal {
     k.userData.press = 1;
     const now = performance.now();
     const a = k.userData.action as KeyAction;
-    if (a === 'buy') this.screen.flash('BUY', 'filled 0.01 BTC · 6.4 µs', 'lime', now);
+    if (a === 'buy' && this.screen.current === 'hello') {
+      this.screen.flash('HI!', 'opening your mail app', 'lime', now);
+      setTimeout(() => this.onSayHi(), 450);
+    } else if (a === 'buy') this.screen.flash('BUY', 'filled 0.01 BTC · 6.4 µs', 'lime', now);
     else if (a === 'sell') this.screen.flash('SELL', 'filled 0.01 BTC · leg risk ok', 'pink', now);
     else this.nextMode();
     this.kick(a === 'next' ? 0.5 : 0.3);
   }
 
   private nextMode() {
-    const i = MODES.indexOf(this.screen.current);
+    const i = MODES.indexOf(this.screen.current as ScreenMode); // from 'hello' (-1) this wraps to the first project
     this.setMode(MODES[(i + 1) % MODES.length], false);
     this.onModeChange(this.screen.current);
   }
@@ -527,7 +533,7 @@ export class Terminal {
     this.glitch = Math.max(this.glitch, amount);
   }
 
-  setMode(mode: ScreenMode, pressKey = true) {
+  setMode(mode: Program, pressKey = true) {
     if (mode === this.screen.current) return;
     this.screen.setMode(mode, performance.now());
     this.kick(0.7);
